@@ -1,65 +1,67 @@
-import Image from "next/image";
+// app/page.tsx
+import Navbar from "@/components/NavBar";
+import ThemeChips from "@/components/ThemeChips";
+import VideoSlider from "@/components/sliders/VideoSlider";
+import PosterSlider from "@/components/sliders/PosterSlider";
+import VoteBar from "@/components/VoteBar";
+import ContributeDialog from "@/components/ContributeDialog";
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+export default function Page() {
+	return (
+		<main className="min-h-screen">
+			<Navbar />
+
+			{/* Hero */}
+			<section className="container mx-auto px-4 pt-20 pb-8">
+				<h1 className="text-4xl md:text-6xl font-semibold tracking-tight leading-tight">
+					<span className="block gradient-text">Democracy 101</span>
+					<span className="block text-zinc-300 mt-1">
+						Civic Education for All
+					</span>
+				</h1>
+				<p className="max-w-2xl mt-4 text-zinc-400">
+					Explore short, community‑made explainers and posters. Vote on what’s
+					most useful and contribute your own ideas, scripts, or designs.
+				</p>
+			</section>
+
+			{/* Themes */}
+			<section className="container mx-auto px-4">
+				<ThemeChips />
+			</section>
+
+			{/* Video slider + actions */}
+			<section className="container mx-auto px-4 mt-8 space-y-4">
+				<VideoSlider />
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+					<ContributeDialog label="Contribute: Video Production" type="video" />
+					<VoteBar
+						id="video-votes"
+						label="Vote: Unimportant"
+						direction="down"
+					/>
+					<VoteBar id="video-votes-up" label="Vote: Important" direction="up" />
+					<ContributeDialog
+						label="Contribute: Video Script/Text"
+						type="script"
+					/>
+				</div>
+			</section>
+
+			{/* Poster slider + actions */}
+			<section className="container mx-auto px-4 mt-14 space-y-4 pb-24">
+				<PosterSlider />
+				<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+					<ContributeDialog label="I want to design a poster" type="poster" />
+					<VoteBar
+						id="poster-votes-down"
+						label="Unimportant"
+						direction="down"
+					/>
+					<VoteBar id="poster-votes-up" label="Important" direction="up" />
+					<ContributeDialog label="I have something to share" type="idea" />
+				</div>
+			</section>
+		</main>
+	);
 }
