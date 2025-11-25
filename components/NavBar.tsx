@@ -15,14 +15,14 @@ export default function Navbar() {
 	return (
 		<header
 			data-nav
-			className="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-black/40 border-b border-white/10">
+			className="sticky top-0 z-40 bg-white   border-b border-white/10">
 			<div className="container mx-auto px-4 h-14 flex items-center justify-between">
 				<div className="font-semibold tracking-tight">Democracy‑101</div>
 				<nav className="flex items-center gap-2">
-					<Button variant="ghost" className="text-zinc-200 hover:text-white">
+					<Button variant="ghost" className="text-zinc-900 hover:text-white">
 						Contribute
 					</Button>
-					<Button variant="ghost" className="text-zinc-200 hover:text-white">
+					<Button variant="ghost" className="text-zinc-900 hover:text-white">
 						Who We Are
 					</Button>
 				</nav>
