@@ -51,7 +51,7 @@ export default function BaseSlider({
 	return (
 		<div ref={wrapperRef} className="relative">
 			<div className="flex items-center justify-between mb-2">
-				<h3 className="text-lg text-zinc-300">{label}</h3>
+				<h3 className="text-lg text-zinc-300 opacity-0">{label}</h3>
 				<div className="hidden md:flex gap-2">
 					<Button
 						size="sm"

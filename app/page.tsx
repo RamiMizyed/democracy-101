@@ -11,6 +11,7 @@ import BaseSlider from "@/components/sliders/BaseSlider";
 import PosterSlider from "@/components/sliders/PosterSlider";
 import VideoSlider from "@/components/sliders/VideoSlider";
 import Landing from "@/components/Landing";
+import ContributeDialog from "@/components/ContributeDialog";
 
 export default function Page() {
 	const heroRef = useRef<HTMLDivElement | null>(null);
@@ -97,11 +98,14 @@ export default function Page() {
 		<main className="min-h-screen  ">
 			<Navbar />
 			<Landing />
-			<section className="mx-auto pt-10 max-w-6xl flex flex-col gap-[5vh]">
-				<ThemeChips />
-				<PosterSlider />
-				<VideoSlider />
-			</section>
+			<div className="w-full h-full bg-linear-to-bl from-zinc-50 via-indigo-50 to-white pt-10 pb-20">
+				<section className="mx-auto  max-w-6xl flex flex-col gap-[5vh] ">
+					<ThemeChips />
+					<PosterSlider />
+					<ContributeDialog label="Contrubute" type="Video" />
+					<VideoSlider />
+				</section>
+			</div>
 		</main>
 	);
 }

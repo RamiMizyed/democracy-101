@@ -1,24 +1,27 @@
 "use client";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 export default function VoteBar({
 	id,
 	label,
 	direction,
+	count,
+	onVote,
 }: {
 	id: string;
 	label: string;
 	direction: "up" | "down";
+	count: number;
+	onVote: () => void;
 }) {
-	const [count, setCount] = useState(0);
 	const arrow = direction === "up" ? "↑" : "↓";
+
 	return (
 		<Button
 			id={id}
-			onClick={() => setCount((c) => c + 1)}
+			onClick={onVote}
 			variant={direction === "up" ? "default" : "secondary"}
-			className="justify-between">
+			className="justify-between w-full text-xs sm:text-sm">
 			<span>{label}</span>
 			<span className="ml-2 tabular-nums">
 				{arrow} {count}
