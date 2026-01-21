@@ -1,118 +1,106 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
-import crypto from "crypto";
 
-export const runtime = "nodejs"; // ✅ IMPORTANT: Prisma must run on Node
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type VoteType = "up" | "down" | null;
 
-function normalizeIds(idsParam: string) {
-	return Array.from(
-		new Set(
-			idsParam
-				.split(",")
-				.map((s) => s.trim())
-				.filter(Boolean),
-		),
-	);
-}
-
 async function getUserId() {
-	const cookieStore = await cookies(); // ✅ Next 16 requires await
-	let uid = cookieStore.get("d101_uid")?.value;
-
-	if (!uid) uid = crypto.randomUUID();
-	return uid;
+	// Next 16 can require await here
+	const store = await cookies();
+	return store.get("d101_uid")?.value ?? "anon";
 }
 
-async function ensureCookie(res: NextResponse, userId: string) {
-	const cookieStore = await cookies();
-	if (!cookieStore.get("d101_uid")?.value) {
-		res.cookies.set("d101_uid", userId, {
-			httpOnly: true,
-			sameSite: "lax",
-			secure: process.env.NODE_ENV === "production",
-			path: "/",
-			maxAge: 60 * 60 * 24 * 365, // 1 year
-		});
-	}
-}
-
-// ✅ GET totals + my vote
 export async function GET(req: Request) {
-	const userId = await getUserId();
-	const { searchParams } = new URL(req.url);
+	try {
+		const userId = await getUserId();
 
-	const ids = normalizeIds(searchParams.get("ids") || "");
-	if (ids.length === 0) {
-		const res = NextResponse.json({ counts: {}, userVotes: {} });
-		await ensureCookie(res, userId);
-		return res;
-	}
+		const { searchParams } = new URL(req.url);
+		const idsParam = searchParams.get("ids") ?? "";
+		const ids = idsParam.split(",").filter(Boolean);
 
-	const votes = await prisma.vote.findMany({
-		where: { contentId: { in: ids } },
-		select: { contentId: true, userId: true, value: true },
-	});
-
-	const counts: Record<string, { up: number; down: number }> = {};
-	const userVotes: Record<string, "up" | "down" | null> = {};
-
-	for (const id of ids) counts[id] = { up: 0, down: 0 };
-
-	for (const v of votes) {
-		if (v.value === 1) counts[v.contentId].up += 1;
-		if (v.value === -1) counts[v.contentId].down += 1;
-
-		if (v.userId === userId) {
-			userVotes[v.contentId] = v.value === 1 ? "up" : "down";
+		if (ids.length === 0) {
+			return NextResponse.json(
+				{ counts: {}, userVotes: {} },
+				{ headers: { "Cache-Control": "no-store" } },
+			);
 		}
-	}
 
-	const res = NextResponse.json({ counts, userVotes });
-	await ensureCookie(res, userId);
-	return res;
+		const votes = await prisma.vote.findMany({
+			where: { contentId: { in: ids } },
+			select: { contentId: true, userId: true, value: true },
+		});
+
+		const counts: Record<string, { up: number; down: number }> = {};
+		const userVotes: Record<string, VoteType> = {};
+
+		for (const id of ids) counts[id] = { up: 0, down: 0 };
+
+		for (const v of votes) {
+			if (v.value === 1) counts[v.contentId].up += 1;
+			if (v.value === -1) counts[v.contentId].down += 1;
+
+			if (v.userId === userId) {
+				userVotes[v.contentId] = v.value === 1 ? "up" : "down";
+			}
+		}
+
+		return NextResponse.json(
+			{ counts, userVotes },
+			{ headers: { "Cache-Control": "no-store" } },
+		);
+	} catch (err) {
+		console.error("GET /api/votes failed:", err);
+		return NextResponse.json({ error: "Votes GET failed" }, { status: 500 });
+	}
 }
 
-// ✅ POST toggle vote (up/down/null)
 export async function POST(req: Request) {
-	const userId = await getUserId();
-	const body = await req.json();
+	try {
+		const userId = await getUserId();
+		const body = await req.json();
 
-	const contentId = body?.contentId as string | undefined;
-	const vote = body?.vote as VoteType;
+		const contentId = body?.contentId as string | undefined;
+		const vote = body?.vote as VoteType;
 
-	if (!contentId) {
-		return NextResponse.json({ error: "Missing contentId" }, { status: 400 });
-	}
+		if (!contentId) {
+			return NextResponse.json({ error: "Missing contentId" }, { status: 400 });
+		}
 
-	if (vote === null) {
-		await prisma.vote.deleteMany({ where: { contentId, userId } });
-	} else {
-		const value = vote === "up" ? 1 : -1;
+		if (vote === null) {
+			await prisma.vote.deleteMany({ where: { contentId, userId } });
+		} else {
+			const value = vote === "up" ? 1 : -1;
+			await prisma.vote.upsert({
+				where: { contentId_userId: { contentId, userId } },
+				update: { value },
+				create: { contentId, userId, value },
+			});
+		}
 
-		await prisma.vote.upsert({
+		// ✅ counts for THIS content only
+		const [up, down] = await Promise.all([
+			prisma.vote.count({ where: { contentId, value: 1 } }),
+			prisma.vote.count({ where: { contentId, value: -1 } }),
+		]);
+
+		const myVote = await prisma.vote.findUnique({
 			where: { contentId_userId: { contentId, userId } },
-			update: { value },
-			create: { contentId, userId, value },
 		});
+
+		return NextResponse.json(
+			{
+				up,
+				down,
+				userVote: myVote ? (myVote.value === 1 ? "up" : "down") : null,
+			},
+			{ headers: { "Cache-Control": "no-store" } },
+		);
+	} catch (err) {
+		console.error("POST /api/votes failed:", err);
+		return NextResponse.json({ error: "Votes POST failed" }, { status: 500 });
 	}
-
-	const [up, down, myVote] = await Promise.all([
-		prisma.vote.count({ where: { contentId, value: 1 } }),
-		prisma.vote.count({ where: { contentId, value: -1 } }),
-		prisma.vote.findUnique({
-			where: { contentId_userId: { contentId, userId } },
-		}),
-	]);
-
-	const res = NextResponse.json({
-		up,
-		down,
-		userVote: myVote ? (myVote.value === 1 ? "up" : "down") : null,
-	});
-
-	await ensureCookie(res, userId);
-	return res;
 }
