@@ -2,7 +2,8 @@
 
 import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
-
+import { useEffect, useMemo } from "react";
+import { useVoteStore } from "@/lib/stores/useVoteStore";
 import Navbar from "@/components/NavBar";
 import ThemeChips from "@/components/ThemeChips";
 import ContentFeed from "@/components/ContentFeed"; // The new component
@@ -35,6 +36,15 @@ export default function Page() {
 			i.type === "image" &&
 			(selectedThemes.length === 0 || selectedThemes.includes(i.category)),
 	);
+	const hydrateVotes = useVoteStore((s) => s.hydrate);
+
+	const allIds = useMemo(() => {
+		return [...filteredImages, ...filteredVideos].map((i) => i.id);
+	}, [filteredImages, filteredVideos]);
+
+	useEffect(() => {
+		if (allIds.length) hydrateVotes(allIds);
+	}, [allIds.join(","), hydrateVotes]);
 
 	// GSAP Animation (Cleaned up)
 	useLayoutEffect(() => {
@@ -54,7 +64,7 @@ export default function Page() {
 				<Landing />
 			</div>
 
-			<div className="w-full bg-gradient-to-b from-zinc-50 to-indigo-50/50 pb-20">
+			<div className="w-full bg-linear-to-b from-zinc-50 to-indigo-50/50 pb-20">
 				{/* Sticky Filter Bar */}
 				<ThemeChips selected={selectedThemes} onToggle={toggleTheme} />
 

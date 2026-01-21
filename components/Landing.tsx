@@ -4,6 +4,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { Lora } from "next/font/google";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 
 const lora = Lora({
 	weight: ["400", "600", "700"],
@@ -14,8 +15,6 @@ const lora = Lora({
 
 const Landing = () => {
 	const sectionRef = useRef<HTMLDivElement | null>(null);
-	const containerRef = useRef<HTMLDivElement | null>(null);
-	const headlineRef = useRef<HTMLHeadingElement | null>(null);
 	const markerRef = useRef<HTMLSpanElement | null>(null);
 
 	useLayoutEffect(() => {
@@ -26,283 +25,318 @@ const Landing = () => {
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 		const ctx = gsap.context(() => {
-			// Entrance states
-			gsap.set(".reveal", { y: 26, opacity: 0, filter: "blur(8px)" });
-			gsap.set(".parallax-item", {
+			gsap.set(".reveal", { y: 16, opacity: 0, filter: "blur(8px)" });
+			gsap.set(".sticker", {
 				opacity: 0,
-				scale: 0.85,
-				filter: "blur(12px)",
+				y: 20,
+				scale: 0.95,
+				rotate: 2,
+				filter: "blur(8px)",
 			});
-
+			gsap.set(".scroll-hint", { opacity: 0, y: 8 });
 			if (markerRef.current) gsap.set(markerRef.current, { scaleX: 0 });
 
 			if (!prefersReducedMotion) {
-				const tl = gsap.timeline({ defaults: { ease: "power4.out" } });
+				const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
 				tl.to(".reveal", {
 					y: 0,
 					opacity: 1,
 					filter: "blur(0px)",
-					duration: 1.2,
+					duration: 0.9,
 					stagger: 0.12,
 				}).to(
-					".parallax-item",
+					".sticker",
 					{
 						opacity: 1,
+						y: 0,
 						scale: 1,
+						rotate: 0,
 						filter: "blur(0px)",
-						duration: 1.6,
-						stagger: { amount: 0.6, from: "random" },
+						duration: 1.1,
+						stagger: 0.08,
 					},
-					"-=0.9",
+					"-=0.55",
 				);
 
-				// Gentle, slower grid drift
 				gsap.to(".bg-grid", {
-					backgroundPosition: "0px 140px",
+					backgroundPosition: "0px 42px",
 					repeat: -1,
-					duration: 7,
+					duration: 9,
 					ease: "none",
 				});
+
+				gsap.to(".scroll-arrow", {
+					y: 6,
+					repeat: -1,
+					yoyo: true,
+					duration: 0.9,
+					ease: "power1.inOut",
+				});
+
+				tl.to(
+					".scroll-hint",
+					{
+						opacity: 1,
+						y: 0,
+						duration: 0.6,
+					},
+					"-=0.25",
+				);
+
+				// optional: ultra subtle idle float (robust + classy)
+				gsap.to(".sticker-float", {
+					y: -6,
+					rotate: 0.6,
+					yoyo: true,
+					repeat: -1,
+					duration: 2.8,
+					ease: "sine.inOut",
+					stagger: 0.15,
+				});
 			} else {
-				// Reduced-motion: show immediately
 				gsap.set(".reveal", { y: 0, opacity: 1, filter: "blur(0px)" });
-				gsap.set(".parallax-item", {
+				gsap.set(".sticker", {
 					opacity: 1,
+					y: 0,
 					scale: 1,
+					rotate: 0,
 					filter: "blur(0px)",
 				});
+				gsap.set(".scroll-hint", { opacity: 1, y: 0 });
 			}
 		}, sectionRef);
 
 		return () => ctx.revert();
 	}, []);
 
-	// Meaningful hover: marker highlight + subtle lift
-	const onHeadlineEnter = () => {
-		if (!markerRef.current || !headlineRef.current) return;
-
-		gsap.to(headlineRef.current, {
-			y: -2,
-			duration: 0.35,
-			ease: "power3.out",
-		});
-
-		gsap.to(markerRef.current, {
-			scaleX: 1,
-			duration: 0.45,
-			ease: "power3.out",
-			transformOrigin: "left center",
-		});
-	};
-
-	const onHeadlineLeave = () => {
-		if (!markerRef.current || !headlineRef.current) return;
-
-		gsap.to(headlineRef.current, {
-			y: 0,
-			duration: 0.35,
-			ease: "power3.out",
-		});
-
-		gsap.to(markerRef.current, {
-			scaleX: 0,
-			duration: 0.35,
-			ease: "power3.inOut",
-			transformOrigin: "right center",
-		});
-	};
-
-	const handleMouseMove = (e: React.MouseEvent) => {
-		// Only do parallax on desktop-ish sizes
-		if (typeof window === "undefined") return;
-		if (window.innerWidth < 768) return;
-		if (!containerRef.current) return;
-
-		const { clientX, clientY } = e;
-		const { innerWidth, innerHeight } = window;
-
-		const x = (clientX / innerWidth - 0.5) * 2;
-		const y = (clientY / innerHeight - 0.5) * 2;
-
-		const items = containerRef.current.querySelectorAll(".parallax-item");
-		items.forEach((item) => {
-			const speed = parseFloat(item.getAttribute("data-speed") || "20");
-			gsap.to(item, {
-				x: x * speed,
-				y: y * speed,
-				duration: 1.8,
-				ease: "power2.out",
-				overwrite: "auto",
-			});
-		});
-	};
-
 	return (
 		<section
 			ref={sectionRef}
-			onMouseMove={handleMouseMove}
-			className={`relative w-full min-h-screen flex flex-col justify-center overflow-hidden bg-[#f4f1e8] text-[#1a1a1a] ${lora.variable} antialiased`}>
+			className={`relative w-full overflow-hidden text-[#141414] ${lora.variable} antialiased`}>
 			{/* BACKGROUND */}
 			<div className="absolute inset-0 z-0 pointer-events-none">
+				<div className="absolute inset-0 bg-[#f5efe6]" />
+
+				{/* Energy glows */}
+				<div className="absolute -top-[22%] -left-[18%] w-[55%] h-[55%] bg-[#FF4E02]/20 blur-[140px] rounded-full" />
+				<div className="absolute -bottom-[25%] -right-[18%] w-[55%] h-[55%] bg-fuchsia-500/14 blur-[160px] rounded-full" />
+				<div className="absolute top-[18%] right-[12%] w-[35%] h-[35%] bg-indigo-500/12 blur-[140px] rounded-full" />
+
+				{/* Dot grid */}
 				<div
-					className="bg-grid absolute inset-0 opacity-[0.26]"
+					className="bg-grid absolute inset-0 opacity-[0.18]"
 					style={{
-						backgroundImage: `radial-gradient(#1a1a1a 1px, transparent 1px)`,
+						backgroundImage: `radial-gradient(rgba(20,20,20,0.8) 1px, transparent 1px)`,
 						backgroundSize: "42px 42px",
 					}}
 				/>
 
-				<div className="absolute inset-0 opacity-[0.12] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
-				<div className="absolute top-[-12%] left-[-10%] w-[55%] h-[55%] bg-[#FF4E02]/10 blur-[130px] rounded-full" />
-				<div className="absolute bottom-[-18%] right-[-12%] w-[60%] h-[60%] bg-[#1a1a1a]/10 blur-[140px] rounded-full" />
+				<div className="absolute inset-0 opacity-[0.14] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+				<div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5" />
 			</div>
 
-			{/* PARALLAX ASSETS (HIDDEN ON MOBILE ✅) */}
-			<div
-				ref={containerRef}
-				className="absolute inset-0 pointer-events-none z-10 hidden md:block">
-				<div
-					className="parallax-item absolute top-[10%] right-[12%] w-64 rotate-12"
-					data-speed="28">
-					<Image
-						src="/images/VoteImg1.png"
-						alt="Vote"
-						width={320}
-						height={320}
-						className="object-contain"
-					/>
-				</div>
-
-				<div
-					className="parallax-item absolute top-[38%] right-[26%] w-44 rotate-2 opacity-90"
-					data-speed="18">
-					<Image
-						src="/images/VoteImg3.png"
-						alt="Sticker"
-						width={240}
-						height={240}
-						className="object-contain"
-					/>
-				</div>
-				<div
-					className="parallax-item absolute top-[48%] right-[26%] w-44 rotate-2 opacity-90"
-					data-speed="18">
-					<Image
-						src="/images/VoteImg5.png"
-						alt="Sticker"
-						width={240}
-						height={240}
-						className="object-contain"
-					/>
-				</div>
-				<div
-					className="parallax-item absolute top-[48%] right-[6%] w-44 2xl:w-64 rotate-2 opacity-90"
-					data-speed="18">
-					<Image
-						src="/images/VoteImg2.png"
-						alt="Sticker"
-						width={240}
-						height={240}
-						className="object-contain"
-					/>
-				</div>
-			</div>
-
-			{/* MAIN CONTENT */}
+			{/* LAYOUT */}
 			<div
 				className="
-          relative z-20 w-full
+          relative z-10
+          container mx-auto
           px-6 sm:px-10 md:px-24
+          min-h-[calc(80vh-64px)]
           py-16 md:py-24
-          flex flex-col
-          items-center md:items-start
-          text-center md:text-left
+          grid md:grid-cols-[1.15fr_0.85fr]
+          items-center gap-10
         ">
-				{/* Eyebrow */}
-				<div className="reveal overflow-hidden mb-5">
-					<span className="inline-block font-sans text-[10px] md:text-sm tracking-[0.38em] font-bold text-[#FF4E02] uppercase border-b border-[#1a1a1a]/40 pb-1">
-						Democracy 101 // Civic education for real life
-					</span>
+				{/* LEFT: HERO COPY */}
+				<div className="flex flex-col items-center md:items-start text-center md:text-left">
+					{/* Eyebrow */}
+					<div className="reveal mb-5">
+						<span className="inline-block font-sans text-[10px] md:text-sm tracking-[0.38em] font-bold text-[#FF4E02] uppercase border-b border-[#141414]/20 pb-1">
+							Democracy 101 // Civic education for real life
+						</span>
+					</div>
+
+					{/* Headline (better rhythm) */}
+					<h1
+						className="
+    reveal
+    font-[var(--font-lora)]
+    font-bold tracking-tight
+    leading-[1.1] 
+    /* Reduced the clamp values: min 2rem, mid 5vw, max 4.5rem */
+    text-[clamp(2rem,5vw,4.5rem)] 
+    /* Increased max-width to ensure the text has room to stay on one line */
+    max-w-[max-content]
+  ">
+						{/* Line 1 */}
+						<span className="block whitespace-nowrap">LEARN THE RULES.</span>
+
+						{/* Line 2 */}
+						<span className="block mt-1 whitespace-nowrap">
+							USE YOUR{" "}
+							<span className="relative inline-block italic text-[#FF4E02]">
+								VOICE.
+								{/* marker highlight */}
+								<span
+									ref={markerRef}
+									className="
+          absolute -z-10 left-[-6%] right-[-6%]
+          bottom-[10%] h-[0.55em]
+          bg-[#FF4E02]/18
+          rounded-md origin-left scale-x-0
+        "
+								/>
+							</span>
+						</span>
+					</h1>
+
+					{/* Subcopy */}
+					<p
+						className="
+              reveal mt-6 md:mt-8
+              text-base md:text-xl
+              font-medium leading-relaxed
+              opacity-90
+              max-w-[56ch]
+            ">
+						Short lessons on voting, institutions, and participation — built for
+						people who want clarity, not confusion.
+						<span className="inline-block ml-2 bg-[#FF4E02] text-[#141414] px-2 py-0.5 -rotate-1 font-bold">
+							Make it count.
+						</span>
+					</p>
+
+					{/* CTA */}
+					<div className="reveal mt-8 md:mt-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+						<button
+							className="
+                w-full sm:w-auto
+                px-8 py-4 md:px-10 md:py-5
+                bg-[#141414] text-white font-bold uppercase tracking-tight
+                hover:bg-[#FF4E02] hover:text-[#141414]
+                transition-colors duration-300
+                shadow-[0_20px_50px_rgba(0,0,0,0.18)]
+                rounded-lg
+              ">
+							Start learning
+						</button>
+
+						<button
+							className="
+                w-full sm:w-auto
+                px-8 py-4 md:px-10 md:py-5
+                border border-[#141414]/12
+                bg-white/45 backdrop-blur-sm
+                font-bold uppercase tracking-tight
+                hover:border-[#FF4E02]/55 hover:text-[#FF4E02]
+                transition-colors duration-300
+                rounded-lg
+              ">
+							Explore topics
+						</button>
+					</div>
 				</div>
 
-				{/* Headline */}
-				<h1
-					ref={headlineRef}
-					onMouseEnter={onHeadlineEnter}
-					onMouseLeave={onHeadlineLeave}
-					className="
-            reveal cursor-default
-            font-[var(--font-lora)]
-            font-bold tracking-tight
-            leading-[0.9]
-            text-[clamp(2.6rem,7vw,6.5rem)]
-            max-w-[18ch]
-          ">
-					<span className="block">LEARN THE RULES.</span>
-
-					<span className="block mt-1">
-						USE YOUR{" "}
-						<span className="relative inline-block italic text-[#FF4E02]">
-							VOICE.
-							{/* marker highlight */}
-							<span
-								ref={markerRef}
-								className="
-                  absolute -z-10 left-[-6%] right-[-6%]
-                  bottom-[12%] h-[0.55em]
-                  bg-[#FF4E02]/20
-                  rounded-md
-                  origin-left scale-x-0
-                "
+				{/* RIGHT: STICKER COLLAGE (proper layout, robust) */}
+				<div className="hidden md:flex justify-center md:justify-end">
+					<div
+						className="
+              relative
+              w-[420px] h-[420px]
+              xl:w-[520px] xl:h-[520px]
+            ">
+						{/* Vote stack (hero sticker) */}
+						<div
+							className="
+                sticker sticker-float
+                absolute top-[4%] right-[6%]
+                rotate-[10deg]
+                transition duration-300
+                hover:-translate-y-2 hover:rotate-[7deg] hover:scale-[1.02]
+              ">
+							<Image
+								src="/images/VoteImg1.png"
+								alt="Vote"
+								width={320}
+								height={320}
+								className="select-none drop-shadow-[0_30px_60px_rgba(0,0,0,0.18)]"
+								priority
 							/>
-						</span>
-					</span>
-				</h1>
+						</div>
 
-				{/* Subcopy */}
-				<p
+						{/* Banner (Be part bigger) */}
+						<div
+							className="
+                sticker sticker-float
+                absolute top-[52%] left-[6%]
+                -rotate-[8deg]
+                transition duration-300
+                hover:-translate-y-2 hover:-rotate-[6deg] hover:scale-[1.02]
+              ">
+							<Image
+								src="/images/VoteImg3.png"
+								alt="Banner"
+								width={220}
+								height={220}
+								className="select-none drop-shadow-[0_28px_60px_rgba(0,0,0,0.14)]"
+							/>
+						</div>
+
+						{/* V icon (anchor) */}
+						<div
+							className="
+                sticker sticker-float
+                absolute bottom-[8%] left-[34%]
+                rotate-[6deg]
+                transition duration-300
+                hover:-translate-y-2 hover:rotate-[3deg] hover:scale-[1.02]
+              ">
+							<Image
+								src="/images/VoteImg5.png"
+								alt="V"
+								width={220}
+								height={220}
+								className="select-none drop-shadow-[0_28px_60px_rgba(0,0,0,0.14)]"
+							/>
+						</div>
+
+						{/* Register (bottom-right) */}
+						<div
+							className="
+                sticker sticker-float
+                absolute bottom-[-30%] right-[6%]
+                -rotate-[6deg]
+                transition duration-300
+                hover:-translate-y-2 hover:-rotate-[3deg] hover:scale-[1.02]
+              ">
+							<Image
+								src="/images/Group 2018779500.png"
+								alt="Register"
+								width={260}
+								height={260}
+								className="select-none drop-shadow-[0_28px_60px_rgba(0,0,0,0.14)]"
+							/>
+						</div>
+					</div>
+				</div>
+
+				{/* MOBILE: show ONE sticker only (clean) */}
+			</div>
+
+			{/* SCROLL CUE */}
+			<div className="scroll-hint absolute bottom-4 left-1/2 -translate-x-1/2 z-30">
+				<div
 					className="
-            reveal mt-6 md:mt-8
-            text-base md:text-xl
-            font-medium leading-relaxed
-            opacity-90
-            max-w-[52ch]
+            flex items-center gap-2
+            px-4 py-2 rounded-full
+            bg-white/45 backdrop-blur-md
+            border border-black/10
+            shadow-sm
           ">
-					Short lessons on voting, institutions, and participation — built for
-					people who want clarity, not confusion.
-					<span className="inline-block ml-2 bg-[#FF4E02] text-[#1a1a1a] px-2 py-0.5 -rotate-1 font-bold">
-						Make it count.
+					<span className="text-xs font-semibold text-black/70">
+						Scroll for lessons
 					</span>
-				</p>
-
-				{/* CTA */}
-				<div className="reveal mt-8 md:mt-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-					<button
-						className="
-              w-full sm:w-auto
-              px-8 py-4 md:px-10 md:py-5
-              bg-[#1a1a1a] text-white font-bold uppercase tracking-tight
-              hover:bg-[#FF4E02] hover:text-[#1a1a1a]
-              transition-colors duration-300
-              shadow-sm
-            ">
-						Start learning
-					</button>
-
-					<button
-						className="
-              w-full sm:w-auto
-              px-8 py-4 md:px-10 md:py-5
-              border border-[#1a1a1a]/15
-              bg-white/40 backdrop-blur-sm
-              font-bold uppercase tracking-tight
-              hover:border-[#FF4E02]/60 hover:text-[#FF4E02]
-              transition-colors duration-300
-            ">
-						Explore topics
-					</button>
+					<ChevronDown className="scroll-arrow w-4 h-4 text-black/70" />
 				</div>
 			</div>
 		</section>
