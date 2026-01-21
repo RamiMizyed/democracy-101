@@ -57,7 +57,7 @@ export default function VideoSlider() {
 							</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<div className="aspect-video w-full rounded-lg bg-gradient-to-br from-indigo-500/30 to-teal-400/30 grid place-items-center overflow-hidden">
+							<div className="aspect-video w-full rounded-lg bg-gradient-to-br from-indigo-500 to-teal-400 grid place-items-center overflow-hidden">
 								{/* Replace this with real <video> / YouTube embed */}
 								<span className="text-sm text-zinc-200">Video placeholder</span>
 							</div>

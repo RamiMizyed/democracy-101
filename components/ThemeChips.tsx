@@ -1,6 +1,5 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 
 const THEMES = [
 	"Elections",
@@ -10,23 +9,26 @@ const THEMES = [
 	"Media Literacy",
 ];
 
-export default function ThemeChips() {
-	const [active, setActive] = useState<string[]>([]);
-	const toggle = (t: string) =>
-		setActive((prev) =>
-			prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]
-		);
+interface ThemeChipsProps {
+	selected: string[];
+	onToggle: (theme: string) => void;
+}
 
+export default function ThemeChips({ selected, onToggle }: ThemeChipsProps) {
 	return (
-		<div className="flex flex-wrap gap-2">
+		<div className="flex flex-wrap gap-2 justify-center py-4 sticky top-[60px] z-30 bg-white/80 backdrop-blur-md border-b">
+			<span className="text-sm font-semibold text-zinc-500 mr-2 self-center">
+				Filter by:
+			</span>
 			{THEMES.map((t) => (
-				<button
-					key={t}
-					onClick={() => toggle(t)}
-					aria-pressed={active.includes(t)}>
+				<button key={t} onClick={() => onToggle(t)}>
 					<Badge
-						variant={active.includes(t) ? "default" : "secondary"}
-						className="cursor-pointer select-none">
+						variant={selected.includes(t) ? "default" : "outline"}
+						className={`cursor-pointer select-none transition-all ${
+							selected.includes(t)
+								? "bg-indigo-600 hover:bg-indigo-700"
+								: "hover:bg-zinc-100"
+						}`}>
 						{t}
 					</Badge>
 				</button>

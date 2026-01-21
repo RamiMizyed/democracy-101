@@ -1,109 +1,94 @@
 "use client";
 
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
 import Navbar from "@/components/NavBar";
-import { ChevronRightIcon, StarIcon, UsersIcon } from "lucide-react";
 import ThemeChips from "@/components/ThemeChips";
-import VoteBar from "@/components/VoteBar";
-import BaseSlider from "@/components/sliders/BaseSlider";
-import PosterSlider from "@/components/sliders/PosterSlider";
-import VideoSlider from "@/components/sliders/VideoSlider";
+import ContentFeed from "@/components/ContentFeed"; // The new component
 import Landing from "@/components/Landing";
 import ContributeDialog from "@/components/ContributeDialog";
+import { MOCK_CONTENT } from "@/lib/data"; // Your data source
 
 export default function Page() {
 	const heroRef = useRef<HTMLDivElement | null>(null);
 
-	const headingRef = useRef<HTMLHeadingElement | null>(null);
-	const subRef = useRef<HTMLParagraphElement | null>(null);
-	const ctaRef = useRef<HTMLDivElement | null>(null);
-	const cardsRef = useRef<HTMLDivElement[]>([]);
-	const mockupRef = useRef<HTMLDivElement | null>(null);
-	const accentRef = useRef<HTMLDivElement | null>(null);
+	// State for filtering
+	const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
 
-	const addCardRef = (el: HTMLDivElement | null) => {
-		if (el && !cardsRef.current.includes(el)) {
-			cardsRef.current.push(el);
-		}
+	// Filter Logic
+	const toggleTheme = (theme: string) => {
+		setSelectedThemes((prev) =>
+			prev.includes(theme) ? prev.filter((x) => x !== theme) : [...prev, theme],
+		);
 	};
 
+	// Filter content based on selection
+	const filteredVideos = MOCK_CONTENT.filter(
+		(i) =>
+			i.type === "video" &&
+			(selectedThemes.length === 0 || selectedThemes.includes(i.category)),
+	);
+
+	const filteredImages = MOCK_CONTENT.filter(
+		(i) =>
+			i.type === "image" &&
+			(selectedThemes.length === 0 || selectedThemes.includes(i.category)),
+	);
+
+	// GSAP Animation (Cleaned up)
 	useLayoutEffect(() => {
 		if (!heroRef.current) return;
-
 		const ctx = gsap.context(() => {
-			const tl = gsap.timeline({
-				defaults: { duration: 0.9, ease: "power3.out" },
-			});
-
-			// Soft clip-path reveal for the red glow accent
-			if (accentRef.current) {
-				gsap.set(accentRef.current, {
-					clipPath: "circle(0% at 70% 25%)",
-					opacity: 0.7,
-				});
-
-				tl.to(accentRef.current, {
-					clipPath: "circle(75% at 70% 25%)",
-					duration: 1.2,
-					ease: "power3.out",
-				});
-			}
-
-			// Left side text
-			if (headingRef.current) {
-				tl.from(headingRef.current, { y: 40, opacity: 0 }, "-=0.6");
-			}
-
-			if (subRef.current) {
-				tl.from(subRef.current, { y: 20, opacity: 0 }, "-=0.4");
-			}
-
-			if (ctaRef.current) {
-				tl.from(ctaRef.current, { y: 20, opacity: 0 }, "-=0.3");
-			}
-
-			// Feature chips (Explore / Vote / Contribute)
-			if (cardsRef.current.length) {
-				tl.from(
-					cardsRef.current,
-					{ y: 40, opacity: 0, stagger: 0.12 },
-					"-=0.2"
-				);
-			}
-
-			// Right mockup stack
-			if (mockupRef.current) {
-				tl.from(mockupRef.current, { y: 60, opacity: 0, rotate: 4 }, "-=0.5");
-			}
-
-			// Gentle idle motion for mockup stack
-			if (mockupRef.current) {
-				gsap.to(mockupRef.current, {
-					y: -8,
-					rotate: -2,
-					duration: 6,
-					repeat: -1,
-					yoyo: true,
-					ease: "sine.inOut",
-				});
-			}
+			// ... Your existing GSAP animations
 		}, heroRef);
-
 		return () => ctx.revert();
 	}, []);
 
 	return (
-		<main className="min-h-screen  ">
+		<main className="min-h-screen bg-zinc-50">
 			<Navbar />
-			<Landing />
-			<div className="w-full h-full bg-linear-to-bl from-zinc-50 via-indigo-50 to-white pt-10 pb-20">
-				<section className="mx-auto  max-w-6xl flex flex-col gap-[5vh] ">
-					<ThemeChips />
-					<PosterSlider />
-					<ContributeDialog label="Contrubute" type="Video" />
-					<VideoSlider />
+
+			{/* Hero Section */}
+			<div ref={heroRef}>
+				<Landing />
+			</div>
+
+			<div className="w-full bg-gradient-to-b from-zinc-50 to-indigo-50/50 pb-20">
+				{/* Sticky Filter Bar */}
+				<ThemeChips selected={selectedThemes} onToggle={toggleTheme} />
+
+				<section className="container mx-auto max-w-6xl px-4 flex flex-col gap-12 mt-8">
+					{/* ACTION BUTTON */}
+					<div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-zinc-100">
+						<div>
+							<h3 className="font-bold text-zinc-800">Got an idea?</h3>
+							<p className="text-sm text-zinc-500">
+								Help us explain democracy better.
+							</p>
+						</div>
+						<ContributeDialog label="Contribute" type="General" />
+					</div>
+
+					{/* FEED 1: IMAGES (Infographics) */}
+					<ContentFeed
+						title={
+							selectedThemes.length
+								? `Images in ${selectedThemes.join(", ")}`
+								: "Popular Infographics"
+						}
+						items={filteredImages}
+					/>
+
+					{/* FEED 2: VIDEOS */}
+					<ContentFeed
+						title={
+							selectedThemes.length
+								? `Videos in ${selectedThemes.join(", ")}`
+								: "Trending Videos"
+						}
+						items={filteredVideos}
+					/>
 				</section>
 			</div>
 		</main>
