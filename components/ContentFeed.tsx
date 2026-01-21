@@ -30,7 +30,11 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 	const lastTapRef = useRef<number>(0);
 
 	const ids = useMemo(() => items.map((i) => i.id), [items]);
+	const hydrate = useVoteStore((s) => s.hydrate);
 
+	useEffect(() => {
+		hydrate(ids);
+	}, [hydrate, ids.join(",")]);
 	// ✅ Detect which card is “active” (in view)
 	useEffect(() => {
 		if (!scrollerRef.current) return;

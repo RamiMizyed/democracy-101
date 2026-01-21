@@ -162,21 +162,18 @@ const Landing = () => {
     reveal
     font-[var(--font-lora)]
     font-bold tracking-tight
-    leading-[1.1] 
-    /* Reduced the clamp values: min 2rem, mid 5vw, max 4.5rem */
-    text-[clamp(2rem,5vw,4.5rem)] 
-    /* Increased max-width to ensure the text has room to stay on one line */
-    max-w-[max-content]
+    leading-[0.95]
+    /* Size is now between your original 6.7rem and my previous 4.5rem */
+    text-[clamp(2.5rem,6vw,5.8rem)] 
+    max-w-[40ch]
   ">
-						{/* Line 1 */}
+						{/* The <span> tags here are ONLY to force the text onto two lines */}
 						<span className="block whitespace-nowrap">LEARN THE RULES.</span>
 
-						{/* Line 2 */}
 						<span className="block mt-1 whitespace-nowrap">
 							USE YOUR{" "}
-							<span className="relative inline-block italic text-[#FF4E02]">
+							<span className="group relative inline-block italic text-[#FF4E02] cursor-pointer transition-transform hover:scale-110 hover:-rotate-2 active:scale-95">
 								VOICE.
-								{/* marker highlight */}
 								<span
 									ref={markerRef}
 									className="
@@ -184,12 +181,13 @@ const Landing = () => {
           bottom-[10%] h-[0.55em]
           bg-[#FF4E02]/18
           rounded-md origin-left scale-x-0
+          transition-transform duration-300
+          group-hover:scale-x-100
         "
 								/>
 							</span>
 						</span>
 					</h1>
-
 					{/* Subcopy */}
 					<p
 						className="

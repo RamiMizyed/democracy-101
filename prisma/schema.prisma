@@ -1,20 +1,20 @@
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-
 
 model Vote {
   id        String   @id @default(cuid())
   contentId String
   userId    String
-  value     Int      // 1 = up, -1 = down
+  value     Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([contentId, userId]) // ✅ stops spam voting
-  @@index([contentId])
+  @@unique([contentId, userId], name: "contentId_userId")
 }
