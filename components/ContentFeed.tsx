@@ -7,6 +7,7 @@ import { ThumbsUp, ThumbsDown, Play, Volume2, VolumeX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ContentItem } from "@/lib/data";
 import { useVoteStore } from "@/lib/stores/useVoteStore";
+import { useShallow } from "zustand/react/shallow";
 
 interface ContentFeedProps {
 	title: string;
@@ -14,28 +15,35 @@ interface ContentFeedProps {
 }
 
 export default function ContentFeed({ title, items }: ContentFeedProps) {
-	const counts = useVoteStore((s) => s.counts);
-	const userVotes = useVoteStore((s) => s.userVotes);
-	const pending = useVoteStore((s) => s.pending);
-	const toggleVote = useVoteStore((s) => s.toggleVote);
+	const { counts, userVotes, pending, toggleVote, hydrate } = useVoteStore(
+		useShallow((s) => ({
+			counts: s.counts,
+			userVotes: s.userVotes,
+			pending: s.pending,
+			toggleVote: s.toggleVote,
+			hydrate: s.hydrate,
+		})),
+	);
 
 	// Reel UX state
 	const scrollerRef = useRef<HTMLDivElement | null>(null);
 	const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
 	const [activeId, setActiveId] = useState<string | null>(null);
-
 	const [muted, setMuted] = useState(true);
 
 	// For “double tap to vote”
 	const lastTapRef = useRef<number>(0);
 
 	const ids = useMemo(() => items.map((i) => i.id), [items]);
-	const hydrate = useVoteStore((s) => s.hydrate);
+	const idsKey = useMemo(() => ids.join(","), [ids]);
 
+	// ✅ hydrate votes on page load
 	useEffect(() => {
+		if (!ids.length) return;
 		hydrate(ids);
-	}, [hydrate, ids.join(",")]);
-	// ✅ Detect which card is “active” (in view)
+	}, [hydrate, idsKey]);
+
+	// ✅ Detect which card is active (in view)
 	useEffect(() => {
 		if (!scrollerRef.current) return;
 
@@ -64,9 +72,9 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		nodes.forEach((n) => observer.observe(n));
 
 		return () => observer.disconnect();
-	}, [ids.join(",")]);
+	}, [idsKey]);
 
-	// ✅ Autoplay active video only (reels behavior)
+	// ✅ Autoplay only active video
 	useEffect(() => {
 		for (const [id, vid] of Object.entries(videoRefs.current)) {
 			if (!vid) continue;
@@ -74,18 +82,15 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 			vid.muted = muted;
 
 			if (id === activeId) {
-				// Try play (mobile policies may require user gesture)
 				const p = vid.play();
 				if (p && typeof p.catch === "function") p.catch(() => {});
 			} else {
 				vid.pause();
-				vid.currentTime = 0;
 			}
 		}
 	}, [activeId, muted]);
 
 	const haptic = () => {
-		// small vibration on mobile (safe)
 		if (typeof navigator !== "undefined" && "vibrate" in navigator) {
 			// @ts-ignore
 			navigator.vibrate?.(12);
@@ -93,18 +98,18 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 	};
 
 	const onMediaTap = (item: ContentItem) => {
-		// single tap: play/pause (for video)
-		// double tap: Helpful vote 👍
 		const now = Date.now();
 		const delta = now - lastTapRef.current;
 		lastTapRef.current = now;
 
+		// ✅ double tap = helpful
 		if (delta < 260) {
 			haptic();
 			toggleVote(item.id, "up");
 			return;
 		}
 
+		// ✅ single tap = pause/play video
 		if (item.type === "video") {
 			const vid = videoRefs.current[item.id];
 			if (!vid) return;
@@ -120,25 +125,17 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		<section className="w-full py-6">
 			<div className="flex items-center justify-between mb-4 px-4 md:px-0">
 				<h2 className="text-2xl font-bold text-zinc-800">{title}</h2>
-
-				{/* Small hint chip */}
 				<span className="hidden md:inline-flex text-xs text-zinc-500">
 					Swipe / scroll • Double tap to “Helpful”
 				</span>
 			</div>
 
-			{/* Reels container */}
 			<div
 				ref={scrollerRef}
 				className="
-          relative
-          flex flex-col
+          relative flex flex-col
           h-[82svh] w-full overflow-y-auto
-          snap-y snap-mandatory
-          gap-6
-          px-4
-          no-scrollbar
-
+          snap-y snap-mandatory gap-6 px-4 no-scrollbar
           md:flex-row md:h-auto md:overflow-x-auto md:overflow-y-hidden
           md:snap-x md:pb-8 md:gap-4 md:px-0
         ">
@@ -154,18 +151,10 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 							data-reel
 							data-id={item.id}
 							className={`
-                snap-center
-                shrink-0
-                relative overflow-hidden
-                rounded-2xl
-                border border-white/10
-                bg-black
-
-                w-full
-                h-[82svh]
-
+                snap-center shrink-0 relative overflow-hidden rounded-2xl
+                border border-white/10 bg-black
+                w-full h-[82svh]
                 md:w-[360px] md:h-[640px]
-
                 transition-all duration-300
                 ${isActive ? "ring-1 ring-white/20" : "opacity-95"}
               `}>
@@ -188,7 +177,6 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 											muted={muted}
 											preload="metadata"
 										/>
-										{/* Slight texture overlay */}
 										<div className="absolute inset-0 bg-black/10" />
 									</>
 								) : (
@@ -203,14 +191,13 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 								)}
 							</div>
 
-							{/* Top row: category + sound */}
+							{/* TOP */}
 							<div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-start justify-between">
 								<div className="flex flex-col gap-2">
 									<Badge className="bg-white/10 text-white border-white/20 backdrop-blur-md">
 										{item.category}
 									</Badge>
 
-									{/* Active indicator */}
 									{isActive && (
 										<span className="text-[11px] text-white/70">
 											{item.type === "video"
@@ -230,8 +217,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
                     rounded-full p-2
                     bg-white/10 border border-white/15
                     text-white/90 backdrop-blur-md
-                    hover:bg-white/15
-                    transition
+                    hover:bg-white/15 transition
                   "
 									aria-label={muted ? "Unmute" : "Mute"}>
 									{muted ? (
@@ -242,18 +228,16 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 								</button>
 							</div>
 
-							{/* Gradient for readability */}
+							{/* GRADIENT */}
 							<div className="absolute inset-x-0 bottom-0 z-10 h-[58%] bg-gradient-to-t from-black via-black/40 to-transparent" />
 
-							{/* Bottom content row */}
+							{/* BOTTOM */}
 							<div
 								className="
                   absolute bottom-0 left-0 right-0 z-20
-                  p-5
-                  pb-[max(1.25rem,env(safe-area-inset-bottom))]
+                  p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]
                 ">
 								<div className="flex items-end gap-4">
-									{/* Left: title + text */}
 									<div className="flex-1 min-w-0">
 										<h3 className="text-white font-extrabold text-xl leading-tight line-clamp-2">
 											{item.title}
@@ -266,7 +250,6 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 											</span>
 										</p>
 
-										{/* Status */}
 										{myVote && (
 											<p className="mt-2 text-xs text-white/60">
 												Saved ✅ Click again to remove.
@@ -274,9 +257,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 										)}
 									</div>
 
-									{/* Right: action rail (Reels style) */}
 									<div className="flex flex-col items-center gap-3">
-										{/* Helpful */}
 										<Button
 											disabled={isPending}
 											variant="ghost"
@@ -286,12 +267,10 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 												toggleVote(item.id, "up");
 											}}
 											className={`
-                        rounded-full
-                        w-12 h-12 p-0
+                        rounded-full w-12 h-12 p-0
                         border border-white/15
                         bg-white/10 backdrop-blur-md
-                        hover:bg-white/15
-                        transition
+                        hover:bg-white/15 transition
                         ${myVote === "up" ? "ring-2 ring-green-400/50" : ""}
                       `}
 											aria-label="Helpful">
@@ -306,7 +285,6 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 											{itemCounts.up}
 										</span>
 
-										{/* Confusing */}
 										<Button
 											disabled={isPending}
 											variant="ghost"
@@ -316,12 +294,10 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 												toggleVote(item.id, "down");
 											}}
 											className={`
-                        rounded-full
-                        w-12 h-12 p-0
+                        rounded-full w-12 h-12 p-0
                         border border-white/15
                         bg-white/10 backdrop-blur-md
-                        hover:bg-white/15
-                        transition
+                        hover:bg-white/15 transition
                         ${myVote === "down" ? "ring-2 ring-red-400/50" : ""}
                       `}
 											aria-label="Confusing">
@@ -336,7 +312,6 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 											{itemCounts.down}
 										</span>
 
-										{/* Play hint for video */}
 										{item.type === "video" && (
 											<div className="mt-2 flex items-center justify-center text-white/70">
 												<Play className="w-4 h-4" />
@@ -345,7 +320,6 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 									</div>
 								</div>
 
-								{/* Tiny pending indicator */}
 								{isPending && (
 									<div className="mt-3 text-xs text-white/60">Saving…</div>
 								)}
