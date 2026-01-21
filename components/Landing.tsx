@@ -146,7 +146,7 @@ const Landing = () => {
 			{/* BACKGROUND */}
 			<div className="absolute inset-0 z-0 pointer-events-none">
 				<div
-					className="bg-grid absolute inset-0 opacity-[0.06]"
+					className="bg-grid absolute inset-0 opacity-[0.26]"
 					style={{
 						backgroundImage: `radial-gradient(#1a1a1a 1px, transparent 1px)`,
 						backgroundSize: "42px 42px",
@@ -176,22 +176,32 @@ const Landing = () => {
 				</div>
 
 				<div
-					className="parallax-item absolute bottom-[18%] right-[5%] w-72 -rotate-6"
-					data-speed="52">
-					<Image
-						src="/images/VoteImg2.png"
-						alt="Register"
-						width={380}
-						height={380}
-						className="object-contain"
-					/>
-				</div>
-
-				<div
 					className="parallax-item absolute top-[38%] right-[26%] w-44 rotate-2 opacity-90"
 					data-speed="18">
 					<Image
 						src="/images/VoteImg3.png"
+						alt="Sticker"
+						width={240}
+						height={240}
+						className="object-contain"
+					/>
+				</div>
+				<div
+					className="parallax-item absolute top-[48%] right-[26%] w-44 rotate-2 opacity-90"
+					data-speed="18">
+					<Image
+						src="/images/VoteImg5.png"
+						alt="Sticker"
+						width={240}
+						height={240}
+						className="object-contain"
+					/>
+				</div>
+				<div
+					className="parallax-item absolute top-[48%] right-[6%] w-44 2xl:w-64 rotate-2 opacity-90"
+					data-speed="18">
+					<Image
+						src="/images/VoteImg2.png"
 						alt="Sticker"
 						width={240}
 						height={240}
