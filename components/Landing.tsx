@@ -253,7 +253,7 @@ const Landing = () => {
                 hover:-translate-y-2 hover:rotate-[7deg] hover:scale-[1.02]
               ">
 							<Image
-								src="/images/VoteImg1.png"
+								src="/Images/VoteImg1.png"
 								alt="Vote"
 								width={320}
 								height={320}
@@ -272,7 +272,7 @@ const Landing = () => {
                 hover:-translate-y-2 hover:-rotate-[6deg] hover:scale-[1.02]
               ">
 							<Image
-								src="/images/VoteImg3.png"
+								src="/Images/VoteImg3.png"
 								alt="Banner"
 								width={220}
 								height={220}
@@ -290,7 +290,7 @@ const Landing = () => {
                 hover:-translate-y-2 hover:rotate-[3deg] hover:scale-[1.02]
               ">
 							<Image
-								src="/images/VoteImg5.png"
+								src="/Images/VoteImg5.png"
 								alt="V"
 								width={220}
 								height={220}
@@ -308,7 +308,7 @@ const Landing = () => {
                 hover:-translate-y-2 hover:-rotate-[3deg] hover:scale-[1.02]
               ">
 							<Image
-								src="/images/Group 2018779500.png"
+								src="/Images/Group 2018779500.png"
 								alt="Register"
 								width={260}
 								height={260}
