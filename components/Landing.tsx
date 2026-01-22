@@ -4,6 +4,7 @@ import React, { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import { Lora } from "next/font/google";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 const lora = Lora({
@@ -24,7 +25,7 @@ export default function Landing() {
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 		const ctx = gsap.context(() => {
-			// ✅ Clean initial states — NO blur, NO rotate, NO goofy scaling
+			// ✅ Clean motion only (opacity + y)
 			gsap.set("[data-hero='reveal']", { autoAlpha: 0, y: 10 });
 			gsap.set("[data-hero='sticker']", { autoAlpha: 0, y: 12 });
 			gsap.set("[data-hero='scroll']", { autoAlpha: 0, y: 8 });
@@ -40,14 +41,14 @@ export default function Landing() {
 				defaults: { ease: "power2.out", duration: 0.7 },
 			});
 
-			// ✅ Text first (fast + crisp)
+			// Text first
 			tl.to("[data-hero='reveal']", {
 				autoAlpha: 1,
 				y: 0,
-				stagger: 0.08,
+				stagger: 0.075,
 			});
 
-			// ✅ Stickers second (subtle)
+			// Stickers second
 			tl.to(
 				"[data-hero='sticker']",
 				{
@@ -59,7 +60,7 @@ export default function Landing() {
 				"-=0.35",
 			);
 
-			// ✅ Scroll hint last
+			// Scroll hint last
 			tl.to(
 				"[data-hero='scroll']",
 				{
@@ -70,15 +71,14 @@ export default function Landing() {
 				"-=0.25",
 			);
 
-			// ✅ Background drift (seamless)
+			// Background drift (very subtle)
 			gsap.to(".bg-grid", {
 				backgroundPosition: "0px 42px",
 				repeat: -1,
-				duration: 11,
+				duration: 12,
 				ease: "none",
 			});
 
-			// ✅ Scroll arrow: small, classy motion
 			gsap.to(".scroll-arrow", {
 				y: 4,
 				repeat: -1,
@@ -95,17 +95,17 @@ export default function Landing() {
 		<section
 			ref={sectionRef}
 			className={`relative w-full overflow-hidden text-[#141414] ${lora.variable} antialiased`}>
-			{/* BACKGROUND (more energy, less "corporate") */}
+			{/* BACKGROUND — energetic but clean */}
 			<div className="absolute inset-0 z-0 pointer-events-none">
 				{/* base */}
 				<div className="absolute inset-0 bg-[#f5efe6]" />
 
-				{/* more energy glows */}
-				<div className="absolute -top-[22%] -left-[18%] w-[55%] h-[55%] bg-[#FF4E02]/25 blur-[140px] rounded-full" />
-				<div className="absolute -bottom-[26%] -right-[18%] w-[60%] h-[60%] bg-fuchsia-500/16 blur-[170px] rounded-full" />
-				<div className="absolute top-[18%] right-[12%] w-[40%] h-[40%] bg-indigo-500/14 blur-[160px] rounded-full" />
+				{/* energy glows */}
+				<div className="absolute -top-[24%] -left-[18%] w-[56%] h-[56%] bg-[#FF4E02]/26 blur-[150px] rounded-full" />
+				<div className="absolute -bottom-[26%] -right-[18%] w-[62%] h-[62%] bg-fuchsia-500/16 blur-[170px] rounded-full" />
+				<div className="absolute top-[18%] right-[12%] w-[40%] h-[40%] bg-indigo-500/14 blur-[165px] rounded-full" />
 
-				{/* warm gradient wash */}
+				{/* warm wash */}
 				<div className="absolute inset-0 bg-gradient-to-b from-white/35 via-transparent to-black/5" />
 
 				{/* dot grid */}
@@ -127,136 +127,213 @@ export default function Landing() {
           relative z-10
           container mx-auto
           px-6 sm:px-10 md:px-24
-          min-h-[calc(82vh-72px)]
-          py-16 md:py-24
+          min-h-[calc(100svh-78px)]
+          py-14 md:py-20
           grid gap-10
-          md:grid-cols-[1.15fr_0.85fr]
+          md:grid-cols-[1.12fr_0.88fr]
           items-center
         ">
 				{/* LEFT */}
 				<div className="flex flex-col items-center md:items-start text-center md:text-left">
-					{/* Eyebrow */}
+					{/* Eyebrow: short-form native */}
 					<div data-hero="reveal" className="mb-5">
-						<span className="inline-block font-sans text-[10px] md:text-sm tracking-[0.38em] font-bold text-[#FF4E02] uppercase border-b border-[#141414]/20 pb-1">
-							Democracy 101 // Civic education for real life
+						<span className="inline-flex items-center gap-2 font-sans text-[10px] md:text-sm tracking-[0.36em] font-extrabold text-[#FF4E02] uppercase border-b border-[#141414]/20 pb-1">
+							<span className="inline-block w-2 h-2 rounded-full bg-[#FF4E02]" />
+							Democracy 101
 						</span>
 					</div>
 
-					{/* Headline (2 lines, mobile-safe) */}
+					{/* Headline: concept-aligned */}
 					<h1
 						data-hero="reveal"
 						className="
               font-[var(--font-lora)]
               font-bold tracking-tight
               leading-[0.95]
-              text-[clamp(2.6rem,6vw,6rem)]
-              max-w-[22ch]
+              text-[clamp(2.55rem,6.2vw,6.1rem)]
+              max-w-[24ch]
               text-balance
             ">
-						<span className="block">LEARN THE RULES.</span>
-
+						<span className="block">DEMOCRACY</span>
 						<span className="block mt-1">
-							USE YOUR{" "}
+							ISN’T AN{" "}
 							<span className="relative inline-block italic text-[#FF4E02]">
-								VOICE.
-								{/* clean highlight underline */}
+								END STATE.
 								<span
 									className="
                     absolute -z-10 left-[-4%] right-[-4%]
-                    bottom-[12%] h-[0.5em]
+                    bottom-[12%] h-[0.52em]
                     rounded-md
-                    bg-gradient-to-r from-[#FF4E02]/25 via-[#FF4E02]/12 to-transparent
+                    bg-gradient-to-r from-[#FF4E02]/26 via-[#FF4E02]/14 to-transparent
                   "
 								/>
 							</span>
 						</span>
+						<span className="block mt-2 text-[clamp(1.2rem,2.3vw,2.1rem)] opacity-85">
+							It’s a skill. Learn it. Use it. Defend it.
+						</span>
 					</h1>
 
-					{/* Subcopy */}
+					{/* Subcopy: the algorithm gap */}
 					<p
 						data-hero="reveal"
 						className="
-              mt-6 md:mt-8
+              mt-6 md:mt-7
               text-base md:text-xl
               font-medium leading-relaxed
               opacity-90
-              max-w-[56ch]
+              max-w-[62ch]
             ">
-						Short lessons on voting, institutions, and participation — built for
-						people who want clarity, not confusion.
-						<span className="inline-block ml-2 bg-[#FF4E02] text-[#141414] px-2 py-0.5 -rotate-1 font-bold rounded-sm">
-							Make it count.
+						Governments, brands, and political machines fight for attention
+						every day. We bring civic clarity into the same feeds — with short
+						videos, infographics, and participation tools that actually stick.
+						<span className="inline-block ml-2 bg-[#FF4E02] text-[#141414] px-2 py-0.5 font-extrabold rounded-md">
+							No lectures.
 						</span>
 					</p>
+
+					{/* Micro value strip */}
+					<div
+						data-hero="reveal"
+						className="mt-5 flex flex-wrap justify-center md:justify-start gap-2">
+						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
+							Swipe-first lessons
+						</span>
+						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
+							Vote “Helpful”
+						</span>
+						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
+							Save & revisit
+						</span>
+						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
+							Participation over noise
+						</span>
+					</div>
 
 					{/* CTA */}
 					<div
 						data-hero="reveal"
-						className="mt-8 md:mt-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-						<button
+						className="mt-8 md:mt-9 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+						<a
+							href="#lessons"
 							className="
                 w-full sm:w-auto
                 px-8 py-4 md:px-10 md:py-5
-                bg-[#141414] text-white font-bold uppercase tracking-tight
+                bg-[#141414] text-white font-extrabold uppercase tracking-tight
                 hover:bg-[#FF4E02] hover:text-[#141414]
                 transition-colors duration-300
                 shadow-[0_22px_60px_rgba(0,0,0,0.16)]
-                rounded-xl
+                rounded-2xl
               ">
 							Start learning
-						</button>
+						</a>
 
-						<button
+						<a
+							href="#themes"
 							className="
                 w-full sm:w-auto
                 px-8 py-4 md:px-10 md:py-5
                 border border-[#141414]/12
                 bg-white/55 backdrop-blur-md
-                font-bold uppercase tracking-tight
+                font-extrabold uppercase tracking-tight
                 hover:border-[#FF4E02]/55 hover:text-[#FF4E02]
                 transition-colors duration-300
-                rounded-xl
+                rounded-2xl
               ">
-							Explore topics
-						</button>
+							Explore themes
+						</a>
+
+						<a
+							href="#contribute"
+							className="
+                w-full sm:w-auto
+                px-8 py-4 md:px-10 md:py-5
+                border border-[#141414]/12
+                bg-white/35 backdrop-blur-md
+                font-extrabold uppercase tracking-tight
+                hover:border-[#141414]/25 hover:bg-white/55
+                transition-colors duration-300
+                rounded-2xl
+              ">
+							Contribute
+						</a>
 					</div>
 
-					{/* MOBILE sticker strip (clean, no chaos) */}
-					<div className="md:hidden mt-10 w-full flex items-center justify-center gap-3">
-						<div
-							data-hero="sticker"
-							className="transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02]">
+					{/* Learn → Vote → Act (participatory positioning) */}
+					<div
+						data-hero="reveal"
+						className="
+              mt-8
+              grid grid-cols-1 sm:grid-cols-3 gap-3
+              w-full max-w-[760px]
+            ">
+						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
+							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
+								Step 1
+							</div>
+							<div className="mt-1 font-extrabold text-zinc-900">
+								Learn the system
+							</div>
+							<div className="mt-1 text-sm text-zinc-600">
+								Democracy, rights, institutions — in short form.
+							</div>
+						</div>
+
+						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
+							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
+								Step 2
+							</div>
+							<div className="mt-1 font-extrabold text-zinc-900">
+								React + vote
+							</div>
+							<div className="mt-1 text-sm text-zinc-600">
+								Mark what helped. Flag what confused. Improve the feed.
+							</div>
+						</div>
+
+						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
+							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
+								Step 3
+							</div>
+							<div className="mt-1 font-extrabold text-zinc-900">
+								Use your voice
+							</div>
+							<div className="mt-1 text-sm text-zinc-600">
+								Participation isn’t a vibe — it’s a practice.
+							</div>
+						</div>
+					</div>
+
+					{/* MOBILE stickers */}
+					<div className="md:hidden mt-9 w-full flex items-center justify-center gap-3">
+						<div data-hero="sticker" className="select-none">
 							<Image
 								src="/images/VoteImg3.png"
 								alt="Sticker"
-								width={80}
-								height={80}
-								className="select-none drop-shadow-[0_20px_45px_rgba(0,0,0,0.14)]"
+								width={84}
+								height={84}
+								className="drop-shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
 							/>
 						</div>
 
-						<div
-							data-hero="sticker"
-							className="transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02]">
+						<div data-hero="sticker" className="select-none">
 							<Image
 								src="/images/VoteImg5.png"
 								alt="Sticker"
-								width={80}
-								height={80}
-								className="select-none drop-shadow-[0_20px_45px_rgba(0,0,0,0.14)]"
+								width={84}
+								height={84}
+								className="drop-shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
 							/>
 						</div>
 
-						<div
-							data-hero="sticker"
-							className="transition-transform duration-300 hover:-translate-y-1 hover:scale-[1.02]">
+						<div data-hero="sticker" className="select-none">
 							<Image
 								src="/images/VoteImg1.png"
 								alt="Vote"
-								width={92}
-								height={92}
-								className="select-none drop-shadow-[0_22px_55px_rgba(0,0,0,0.16)]"
+								width={98}
+								height={98}
 								priority
+								className="drop-shadow-[0_20px_55px_rgba(0,0,0,0.16)]"
 							/>
 						</div>
 					</div>
@@ -264,75 +341,100 @@ export default function Landing() {
 
 				{/* RIGHT collage (DESKTOP ONLY) */}
 				<div className="hidden md:flex justify-center md:justify-end">
-					<div className="relative w-[420px] h-[420px] xl:w-[520px] xl:h-[520px]">
-						{/* hero sticker */}
+					<div className="relative w-[430px] h-[430px] xl:w-[540px] xl:h-[540px]">
+						{/* Main vote sticker */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute top-[6%] right-[6%]
+                absolute top-[4%] right-[6%]
                 transition-transform duration-300
-                hover:-translate-y-2 hover:scale-[1.02]
+                hover:-translate-y-2
                 will-change-transform
               ">
 							<Image
 								src="/images/VoteImg1.png"
 								alt="Vote"
-								width={330}
-								height={330}
-								className="select-none drop-shadow-[0_32px_70px_rgba(0,0,0,0.18)]"
+								width={350}
+								height={350}
 								priority
+								className="select-none drop-shadow-[0_32px_75px_rgba(0,0,0,0.18)]"
 							/>
 						</div>
 
+						{/* Banner */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute top-[54%] left-[2%]
+                absolute top-[56%] left-[2%]
                 transition-transform duration-300
-                hover:-translate-y-2 hover:scale-[1.02]
+                hover:-translate-y-2
                 will-change-transform
               ">
 							<Image
 								src="/images/VoteImg3.png"
 								alt="Banner"
-								width={220}
-								height={220}
+								width={230}
+								height={230}
 								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
 							/>
 						</div>
 
+						{/* V icon */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute bottom-[4%] left-[34%]
+                absolute bottom-[6%] left-[34%]
                 transition-transform duration-300
-                hover:-translate-y-2 hover:scale-[1.02]
+                hover:-translate-y-2
                 will-change-transform
               ">
 							<Image
 								src="/images/VoteImg5.png"
 								alt="V"
-								width={220}
-								height={220}
+								width={230}
+								height={230}
 								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
 							/>
 						</div>
 
+						{/* Register sticker */}
 						<div
 							data-hero="sticker"
 							className="
                 absolute bottom-[-18%] right-[4%]
                 transition-transform duration-300
-                hover:-translate-y-2 hover:scale-[1.02]
+                hover:-translate-y-2
                 will-change-transform
               ">
 							<Image
 								src="/images/Group 2018779500.png"
 								alt="Register"
-								width={260}
-								height={260}
+								width={270}
+								height={270}
 								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
 							/>
+						</div>
+
+						{/* Mission pill overlay */}
+						<div
+							data-hero="sticker"
+							className="
+                absolute left-[10%] top-[10%]
+                rounded-2xl
+                border border-black/10
+                bg-white/60 backdrop-blur-xl
+                px-4 py-3
+                shadow-sm
+              ">
+							<div className="text-[11px] font-black tracking-[0.22em] uppercase text-[#FF4E02]">
+								Mission
+							</div>
+							<div className="mt-1 text-sm font-extrabold text-zinc-900">
+								Beat the spin.
+							</div>
+							<div className="text-xs text-zinc-600 font-semibold">
+								Civic education that fits the feed.
+							</div>
 						</div>
 					</div>
 				</div>

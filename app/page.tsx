@@ -10,6 +10,9 @@ import ContentFeed from "@/components/ContentFeed"; // The new component
 import Landing from "@/components/Landing";
 import ContributeDialog from "@/components/ContributeDialog";
 import { MOCK_CONTENT } from "@/lib/data"; // Your data source
+import WhySection from "@/components/WhySection";
+import ThemePicker from "@/components/ThemePicker";
+import ContributeSection from "@/components/ContributeSection";
 
 export default function Page() {
 	const heroRef = useRef<HTMLDivElement | null>(null);
@@ -63,22 +66,16 @@ export default function Page() {
 			<div ref={heroRef}>
 				<Landing />
 			</div>
+			<WhySection />
+			<ThemePicker />
 
 			<div className="w-full bg-linear-to-b from-zinc-50 to-indigo-50/50 pb-20">
 				{/* Sticky Filter Bar */}
-				<ThemeChips selected={selectedThemes} onToggle={toggleTheme} />
 
-				<section className="container mx-auto max-w-6xl px-4 flex flex-col gap-12 mt-8">
+				<section className="container mx-auto  px-4 flex flex-col gap-12 mt-8">
 					{/* ACTION BUTTON */}
-					<div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-zinc-100">
-						<div>
-							<h3 className="font-bold text-zinc-800">Got an idea?</h3>
-							<p className="text-sm text-zinc-500">
-								Help us explain democracy better.
-							</p>
-						</div>
-						<ContributeDialog label="Contribute" type="General" />
-					</div>
+
+					<ThemeChips selected={selectedThemes} onToggle={toggleTheme} />
 
 					{/* FEED 1: IMAGES (Infographics) */}
 					<ContentFeed
@@ -100,6 +97,16 @@ export default function Page() {
 						items={filteredVideos}
 					/>
 				</section>
+				<div className="flex flex-col justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-zinc-100">
+					<div>
+						<h3 className="font-bold text-zinc-800">Got an idea?</h3>
+						<p className="text-sm text-zinc-500">
+							Help us explain democracy better.
+						</p>
+					</div>
+					<ContributeSection />
+					<ContributeDialog label="Contribute" type="General" />
+				</div>
 			</div>
 		</main>
 	);
