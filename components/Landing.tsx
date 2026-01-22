@@ -25,10 +25,10 @@ export default function Landing() {
 			window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 		const ctx = gsap.context(() => {
-			// ✅ Clean motion only (opacity + y)
-			gsap.set("[data-hero='reveal']", { autoAlpha: 0, y: 10 });
-			gsap.set("[data-hero='sticker']", { autoAlpha: 0, y: 12 });
-			gsap.set("[data-hero='scroll']", { autoAlpha: 0, y: 8 });
+			// ✅ Clean motion only: opacity + y (no blur, no rotation animation)
+			gsap.set("[data-hero='reveal']", { autoAlpha: 0, y: 12 });
+			gsap.set("[data-hero='sticker']", { autoAlpha: 0, y: 14 });
+			gsap.set("[data-hero='scroll']", { autoAlpha: 0, y: 10 });
 
 			if (prefersReducedMotion) {
 				gsap.set("[data-hero='reveal']", { autoAlpha: 1, y: 0 });
@@ -38,29 +38,26 @@ export default function Landing() {
 			}
 
 			const tl = gsap.timeline({
-				defaults: { ease: "power2.out", duration: 0.7 },
+				defaults: { ease: "power2.out", duration: 0.65 },
 			});
 
-			// Text first
 			tl.to("[data-hero='reveal']", {
 				autoAlpha: 1,
 				y: 0,
 				stagger: 0.075,
 			});
 
-			// Stickers second
 			tl.to(
 				"[data-hero='sticker']",
 				{
 					autoAlpha: 1,
 					y: 0,
 					stagger: 0.06,
-					duration: 0.75,
+					duration: 0.7,
 				},
-				"-=0.35",
+				"-=0.32",
 			);
 
-			// Scroll hint last
 			tl.to(
 				"[data-hero='scroll']",
 				{
@@ -68,17 +65,10 @@ export default function Landing() {
 					y: 0,
 					duration: 0.55,
 				},
-				"-=0.25",
+				"-=0.22",
 			);
 
-			// Background drift (very subtle)
-			gsap.to(".bg-grid", {
-				backgroundPosition: "0px 42px",
-				repeat: -1,
-				duration: 12,
-				ease: "none",
-			});
-
+			// subtle scroll arrow (classy)
 			gsap.to(".scroll-arrow", {
 				y: 4,
 				repeat: -1,
@@ -94,31 +84,26 @@ export default function Landing() {
 	return (
 		<section
 			ref={sectionRef}
-			className={`relative w-full overflow-hidden text-[#141414] ${lora.variable} antialiased`}>
-			{/* BACKGROUND — energetic but clean */}
-			<div className="absolute inset-0 z-0 pointer-events-none">
-				{/* base */}
-				<div className="absolute inset-0 bg-[#f5efe6]" />
+			className={`relative w-full overflow-hidden ${lora.variable} antialiased bg-[#f6f0e8] text-[#0b0b0b]`}>
+			{/* ZINE BACKDROP */}
+			<div className="pointer-events-none absolute inset-0">
+				{/* base paper */}
+				<div className="absolute inset-0 bg-[#f6f0e8]" />
 
-				{/* energy glows */}
-				<div className="absolute -top-[24%] -left-[18%] w-[56%] h-[56%] bg-[#FF4E02]/26 blur-[150px] rounded-full" />
-				<div className="absolute -bottom-[26%] -right-[18%] w-[62%] h-[62%] bg-fuchsia-500/16 blur-[170px] rounded-full" />
-				<div className="absolute top-[18%] right-[12%] w-[40%] h-[40%] bg-indigo-500/14 blur-[165px] rounded-full" />
+				{/* harsh cross hatch */}
+				<div className="absolute inset-0 opacity-[0.10] bg-[repeating-linear-gradient(135deg,rgba(0,0,0,0.9)_0px,rgba(0,0,0,0.9)_1px,transparent_1px,transparent_14px)]" />
 
-				{/* warm wash */}
-				<div className="absolute inset-0 bg-gradient-to-b from-white/35 via-transparent to-black/5" />
+				{/* micro dots */}
+				<div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle,rgba(0,0,0,1)_1px,transparent_1px)] [background-size:18px_18px]" />
 
-				{/* dot grid */}
-				<div
-					className="bg-grid absolute inset-0 opacity-[0.18]"
-					style={{
-						backgroundImage: `radial-gradient(rgba(20,20,20,0.75) 1px, transparent 1px)`,
-						backgroundSize: "42px 42px",
-					}}
-				/>
+				{/* orange slash */}
+				<div className="absolute -top-12 -left-10 w-[560px] h-[140px] rotate-[-10deg] bg-[#FF4E02] opacity-[0.18]" />
 
-				{/* grain */}
-				<div className="absolute inset-0 opacity-[0.14] mix-blend-multiply bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+				{/* black tape strip */}
+				<div className="absolute top-10 right-[-140px] w-[520px] h-[44px] rotate-[7deg] bg-black/80 opacity-[0.12]" />
+
+				{/* bottom dirty vignette */}
+				<div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-black/10 via-transparent to-transparent" />
 			</div>
 
 			{/* HERO */}
@@ -135,247 +120,269 @@ export default function Landing() {
         ">
 				{/* LEFT */}
 				<div className="flex flex-col items-center md:items-start text-center md:text-left">
-					{/* Eyebrow: short-form native */}
+					{/* STAMP */}
 					<div data-hero="reveal" className="mb-5">
-						<span className="inline-flex items-center gap-2 font-sans text-[10px] md:text-sm tracking-[0.36em] font-extrabold text-[#FF4E02] uppercase border-b border-[#141414]/20 pb-1">
-							<span className="inline-block w-2 h-2 rounded-full bg-[#FF4E02]" />
+						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em]">
+							<span className="inline-block h-2 w-2 bg-[#FF4E02]" />
 							Democracy 101
+						</span>
+
+						<span className="ml-3 text-[11px] font-black uppercase tracking-[0.22em] opacity-60">
+							feed-native civic education
 						</span>
 					</div>
 
-					{/* Headline: concept-aligned */}
+					{/* HEADLINE */}
 					<h1
 						data-hero="reveal"
 						className="
               font-[var(--font-lora)]
-              font-bold tracking-tight
-              leading-[0.95]
-              text-[clamp(2.55rem,6.2vw,6.1rem)]
-              max-w-[24ch]
-              text-balance
+              font-black tracking-tight
+              leading-[0.88]
+              text-[clamp(2.55rem,6.2vw,6.2rem)]
+              max-w-[22ch]
+              uppercase
             ">
-						<span className="block">DEMOCRACY</span>
+						<span className="block">Democracy</span>
+
 						<span className="block mt-1">
-							ISN’T AN{" "}
-							<span className="relative inline-block italic text-[#FF4E02]">
-								END STATE.
-								<span
-									className="
-                    absolute -z-10 left-[-4%] right-[-4%]
-                    bottom-[12%] h-[0.52em]
-                    rounded-md
-                    bg-gradient-to-r from-[#FF4E02]/26 via-[#FF4E02]/14 to-transparent
-                  "
-								/>
+							is not a{" "}
+							<span className="relative inline-block text-[#FF4E02]">
+								destination
+								<span className="absolute left-0 right-0 -bottom-1 h-[10px] bg-[#FF4E02] opacity-70 -z-10" />
 							</span>
+							.
 						</span>
-						<span className="block mt-2 text-[clamp(1.2rem,2.3vw,2.1rem)] opacity-85">
-							It’s a skill. Learn it. Use it. Defend it.
+
+						<span className="block mt-3 text-[clamp(1.05rem,2.3vw,2rem)] font-black uppercase opacity-80">
+							it’s a practice. learn it. use it. defend it.
 						</span>
 					</h1>
 
-					{/* Subcopy: the algorithm gap */}
+					{/* SUBCOPY */}
 					<p
 						data-hero="reveal"
-						className="
-              mt-6 md:mt-7
-              text-base md:text-xl
-              font-medium leading-relaxed
-              opacity-90
-              max-w-[62ch]
-            ">
-						Governments, brands, and political machines fight for attention
-						every day. We bring civic clarity into the same feeds — with short
-						videos, infographics, and participation tools that actually stick.
-						<span className="inline-block ml-2 bg-[#FF4E02] text-[#141414] px-2 py-0.5 font-extrabold rounded-md">
-							No lectures.
+						className="mt-6 max-w-[68ch] text-base md:text-lg leading-relaxed font-semibold text-black/80">
+						Brands and governments spend billions to shape what you think.
+						<br />
+						We bring democracy, human rights, and civic power into the same
+						feeds —<span className="font-black text-black">
+							{" "}
+							short videos
+						</span>,{" "}
+						<span className="font-black text-black">visual lessons</span>, and
+						tools that let you participate.
+						<span className="ml-2 inline-block border-2 border-black bg-[#FF4E02] px-2 py-0.5 text-xs font-black uppercase tracking-tight">
+							no lectures
 						</span>
 					</p>
 
-					{/* Micro value strip */}
+					{/* STICKER CHIPS */}
 					<div
 						data-hero="reveal"
-						className="mt-5 flex flex-wrap justify-center md:justify-start gap-2">
-						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
-							Swipe-first lessons
+						className="mt-6 flex flex-wrap justify-center md:justify-start gap-2">
+						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-2deg]">
+							⚡ short episodes
 						</span>
-						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
-							Vote “Helpful”
+						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[1deg]">
+							🧠 real examples
 						</span>
-						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
-							Save & revisit
+						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-1deg]">
+							🗳️ vote helpful / confusing
 						</span>
-						<span className="rounded-full px-3 py-1 text-xs font-bold bg-white/70 border border-black/10">
-							Participation over noise
+						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[2deg]">
+							🔥 learn → vote → act
 						</span>
 					</div>
 
-					{/* CTA */}
+					{/* CTA (SCREEN PRINT STYLE) */}
 					<div
 						data-hero="reveal"
-						className="mt-8 md:mt-9 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-						<a
+						className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+						<Link
 							href="#lessons"
 							className="
-                w-full sm:w-auto
-                px-8 py-4 md:px-10 md:py-5
-                bg-[#141414] text-white font-extrabold uppercase tracking-tight
-                hover:bg-[#FF4E02] hover:text-[#141414]
-                transition-colors duration-300
-                shadow-[0_22px_60px_rgba(0,0,0,0.16)]
-                rounded-2xl
+                inline-flex items-center justify-center
+                border-2 border-black
+                bg-black text-white
+                px-6 py-4
+                font-black uppercase tracking-tight
+                shadow-[6px_6px_0_0_rgba(0,0,0,1)]
+                hover:translate-x-[1px] hover:translate-y-[1px]
+                hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
+                transition
               ">
 							Start learning
-						</a>
+						</Link>
 
-						<a
+						<Link
 							href="#themes"
 							className="
-                w-full sm:w-auto
-                px-8 py-4 md:px-10 md:py-5
-                border border-[#141414]/12
-                bg-white/55 backdrop-blur-md
-                font-extrabold uppercase tracking-tight
-                hover:border-[#FF4E02]/55 hover:text-[#FF4E02]
-                transition-colors duration-300
-                rounded-2xl
+                inline-flex items-center justify-center
+                border-2 border-black
+                bg-white text-black
+                px-6 py-4
+                font-black uppercase tracking-tight
+                shadow-[6px_6px_0_0_rgba(0,0,0,1)]
+                hover:translate-x-[1px] hover:translate-y-[1px]
+                hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
+                transition
               ">
 							Explore themes
-						</a>
+						</Link>
 
-						<a
+						<Link
 							href="#contribute"
 							className="
-                w-full sm:w-auto
-                px-8 py-4 md:px-10 md:py-5
-                border border-[#141414]/12
-                bg-white/35 backdrop-blur-md
-                font-extrabold uppercase tracking-tight
-                hover:border-[#141414]/25 hover:bg-white/55
-                transition-colors duration-300
-                rounded-2xl
+                inline-flex items-center justify-center
+                border-2 border-black
+                bg-[#FF4E02] text-black
+                px-6 py-4
+                font-black uppercase tracking-tight
+                shadow-[6px_6px_0_0_rgba(0,0,0,1)]
+                hover:translate-x-[1px] hover:translate-y-[1px]
+                hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
+                transition
               ">
 							Contribute
-						</a>
+						</Link>
 					</div>
 
-					{/* Learn → Vote → Act (participatory positioning) */}
-					<div
-						data-hero="reveal"
-						className="
-              mt-8
-              grid grid-cols-1 sm:grid-cols-3 gap-3
-              w-full max-w-[760px]
-            ">
-						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
-							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
-								Step 1
-							</div>
-							<div className="mt-1 font-extrabold text-zinc-900">
-								Learn the system
-							</div>
-							<div className="mt-1 text-sm text-zinc-600">
-								Democracy, rights, institutions — in short form.
-							</div>
-						</div>
-
-						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
-							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
-								Step 2
-							</div>
-							<div className="mt-1 font-extrabold text-zinc-900">
-								React + vote
-							</div>
-							<div className="mt-1 text-sm text-zinc-600">
-								Mark what helped. Flag what confused. Improve the feed.
-							</div>
-						</div>
-
-						<div className="rounded-2xl border border-black/10 bg-white/60 backdrop-blur-xl p-4 text-left">
-							<div className="text-xs font-black tracking-[0.22em] uppercase text-[#FF4E02]">
-								Step 3
-							</div>
-							<div className="mt-1 font-extrabold text-zinc-900">
-								Use your voice
-							</div>
-							<div className="mt-1 text-sm text-zinc-600">
-								Participation isn’t a vibe — it’s a practice.
-							</div>
-						</div>
-					</div>
-
-					{/* MOBILE stickers */}
+					{/* MOBILE STICKER STRIP */}
 					<div className="md:hidden mt-9 w-full flex items-center justify-center gap-3">
-						<div data-hero="sticker" className="select-none">
+						<div data-hero="sticker" className="rotate-[-2deg]">
 							<Image
-								src="/Images/VoteImg3.png"
+								src="/images/VoteImg3.png"
 								alt="Sticker"
-								width={84}
-								height={84}
-								className="drop-shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
+								width={88}
+								height={88}
+								className="select-none"
+								priority={false}
 							/>
 						</div>
 
-						<div data-hero="sticker" className="select-none">
+						<div data-hero="sticker" className="rotate-[2deg]">
 							<Image
-								src="/Images/VoteImg5.png"
+								src="/images/VoteImg5.png"
 								alt="Sticker"
-								width={84}
-								height={84}
-								className="drop-shadow-[0_18px_45px_rgba(0,0,0,0.14)]"
+								width={88}
+								height={88}
+								className="select-none"
+								priority={false}
 							/>
 						</div>
 
-						<div data-hero="sticker" className="select-none">
+						<div data-hero="sticker" className="rotate-[-1deg]">
 							<Image
-								src="/Images/VoteImg1.png"
+								src="/images/VoteImg1.png"
 								alt="Vote"
-								width={98}
-								height={98}
+								width={104}
+								height={104}
+								className="select-none"
 								priority
-								className="drop-shadow-[0_20px_55px_rgba(0,0,0,0.16)]"
 							/>
 						</div>
 					</div>
 				</div>
 
-				{/* RIGHT collage (DESKTOP ONLY) */}
+				{/* RIGHT COLLAGE (DESKTOP ONLY) */}
 				<div className="hidden md:flex justify-center md:justify-end">
-					<div className="relative w-[430px] h-[430px] xl:w-[540px] xl:h-[540px]">
-						{/* Main vote sticker */}
+					<div className="relative w-[440px] h-[520px] xl:w-[560px] xl:h-[620px]">
+						{/* tape corners */}
+						<div className="absolute -top-2 left-8 w-24 h-7 bg-black/80 opacity-20 rotate-[-8deg]" />
+						<div className="absolute -top-3 right-10 w-20 h-7 bg-black/80 opacity-20 rotate-[11deg]" />
+
+						{/* big sticker */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute top-[4%] right-[6%]
-                transition-transform duration-300
-                hover:-translate-y-2
-                will-change-transform
+                absolute top-[6%] right-[4%]
+                rotate-[2deg]
+                border-2 border-black
+                bg-white
+                shadow-[10px_10px_0_0_rgba(0,0,0,1)]
+                p-3
               ">
 							<Image
-								src="/Images/VoteImg1.png"
+								src="/images/VoteImg1.png"
 								alt="Vote"
-								width={350}
-								height={350}
+								width={340}
+								height={340}
 								priority
-								className="select-none drop-shadow-[0_32px_75px_rgba(0,0,0,0.18)]"
+								className="select-none"
 							/>
 						</div>
 
-						{/* Banner */}
+						{/* manifesto card */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute top-[56%] left-[2%]
-                transition-transform duration-300
-                hover:-translate-y-2
-                will-change-transform
+                absolute left-[0%] top-[12%]
+                w-[290px]
+                border-2 border-black
+                bg-white
+                shadow-[10px_10px_0_0_rgba(0,0,0,1)]
+                p-5
+                rotate-[-2deg]
+              ">
+							<div className="flex items-start justify-between gap-3">
+								<div>
+									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
+										mission
+									</div>
+									<div className="mt-2 text-2xl font-black uppercase leading-none">
+										Beat the <span className="text-[#FF4E02]">spin</span>.
+									</div>
+								</div>
+
+								<span className="border-2 border-black bg-[#FF4E02] px-2 py-1 text-[11px] font-black uppercase tracking-[0.18em]">
+									no bs
+								</span>
+							</div>
+
+							<div className="mt-4 space-y-3">
+								<div className="border-2 border-black p-3">
+									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-60">
+										01
+									</div>
+									<div className="mt-1 font-black uppercase">
+										Rights are standards
+									</div>
+									<div className="mt-1 text-sm font-semibold text-black/80">
+										Not rewards. Limits on power.
+									</div>
+								</div>
+
+								<div className="border-2 border-black p-3">
+									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-60">
+										02
+									</div>
+									<div className="mt-1 font-black uppercase">
+										Minorities matter
+									</div>
+									<div className="mt-1 text-sm font-semibold text-black/80">
+										Majorities stay legit by protecting dissent.
+									</div>
+								</div>
+							</div>
+						</div>
+
+						{/* banner sticker */}
+						<div
+							data-hero="sticker"
+							className="
+                absolute bottom-[20%] left-[6%]
+                rotate-[1deg]
+                border-2 border-black bg-white
+                shadow-[10px_10px_0_0_rgba(0,0,0,1)]
+                p-3
               ">
 							<Image
-								src="/Images/VoteImg3.png"
+								src="/images/VoteImg3.png"
 								alt="Banner"
 								width={230}
 								height={230}
-								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
+								className="select-none"
 							/>
 						</div>
 
@@ -383,57 +390,34 @@ export default function Landing() {
 						<div
 							data-hero="sticker"
 							className="
-                absolute bottom-[6%] left-[34%]
-                transition-transform duration-300
-                hover:-translate-y-2
-                will-change-transform
+                absolute bottom-[5%] right-[34%]
+                rotate-[-2deg]
+                border-2 border-black bg-white
+                shadow-[10px_10px_0_0_rgba(0,0,0,1)]
+                p-3
               ">
 							<Image
-								src="/Images/VoteImg5.png"
+								src="/images/VoteImg5.png"
 								alt="V"
-								width={230}
-								height={230}
-								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
+								width={220}
+								height={220}
+								className="select-none"
 							/>
 						</div>
 
-						{/* Register sticker */}
+						{/* bottom orange tag */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute bottom-[-18%] right-[4%]
-                transition-transform duration-300
-                hover:-translate-y-2
-                will-change-transform
+                absolute -bottom-6 right-8
+                rotate-[2deg]
+                border-2 border-black
+                bg-[#FF4E02]
+                shadow-[6px_6px_0_0_rgba(0,0,0,1)]
+                px-4 py-2
               ">
-							<Image
-								src="/Images/Group 2018779500.png"
-								alt="Register"
-								width={270}
-								height={270}
-								className="select-none drop-shadow-[0_26px_60px_rgba(0,0,0,0.14)]"
-							/>
-						</div>
-
-						{/* Mission pill overlay */}
-						<div
-							data-hero="sticker"
-							className="
-                absolute left-[10%] top-[10%]
-                rounded-2xl
-                border border-black/10
-                bg-white/60 backdrop-blur-xl
-                px-4 py-3
-                shadow-sm
-              ">
-							<div className="text-[11px] font-black tracking-[0.22em] uppercase text-[#FF4E02]">
-								Mission
-							</div>
-							<div className="mt-1 text-sm font-extrabold text-zinc-900">
-								Beat the spin.
-							</div>
-							<div className="text-xs text-zinc-600 font-semibold">
-								Civic education that fits the feed.
+							<div className="text-[11px] font-black uppercase tracking-[0.22em]">
+								youth-made • feed-native
 							</div>
 						</div>
 					</div>
@@ -447,15 +431,15 @@ export default function Landing() {
 				<div
 					className="
             flex items-center gap-2
-            px-4 py-2 rounded-full
-            bg-white/55 backdrop-blur-md
-            border border-black/10
-            shadow-sm
+            border-2 border-black
+            bg-white
+            px-4 py-2
+            shadow-[6px_6px_0_0_rgba(0,0,0,1)]
           ">
-					<span className="text-xs font-semibold text-black/70">
-						Scroll for lessons
+					<span className="text-xs font-black uppercase tracking-tight">
+						scroll for lessons
 					</span>
-					<ChevronDown className="scroll-arrow w-4 h-4 text-black/70" />
+					<ChevronDown className="scroll-arrow w-4 h-4" />
 				</div>
 			</div>
 		</section>
