@@ -308,7 +308,7 @@ export default function Landing() {
 					<div className="md:hidden mt-9 w-full flex items-center justify-center gap-3">
 						<div data-hero="sticker" className="select-none">
 							<Image
-								src="/images/VoteImg3.png"
+								src="/Images/VoteImg3.png"
 								alt="Sticker"
 								width={84}
 								height={84}
@@ -318,7 +318,7 @@ export default function Landing() {
 
 						<div data-hero="sticker" className="select-none">
 							<Image
-								src="/images/VoteImg5.png"
+								src="/Images/VoteImg5.png"
 								alt="Sticker"
 								width={84}
 								height={84}
@@ -328,7 +328,7 @@ export default function Landing() {
 
 						<div data-hero="sticker" className="select-none">
 							<Image
-								src="/images/VoteImg1.png"
+								src="/Images/VoteImg1.png"
 								alt="Vote"
 								width={98}
 								height={98}
@@ -352,7 +352,7 @@ export default function Landing() {
                 will-change-transform
               ">
 							<Image
-								src="/images/VoteImg1.png"
+								src="/Images/VoteImg1.png"
 								alt="Vote"
 								width={350}
 								height={350}
@@ -371,7 +371,7 @@ export default function Landing() {
                 will-change-transform
               ">
 							<Image
-								src="/images/VoteImg3.png"
+								src="/Images/VoteImg3.png"
 								alt="Banner"
 								width={230}
 								height={230}
@@ -389,7 +389,7 @@ export default function Landing() {
                 will-change-transform
               ">
 							<Image
-								src="/images/VoteImg5.png"
+								src="/Images/VoteImg5.png"
 								alt="V"
 								width={230}
 								height={230}
@@ -407,7 +407,7 @@ export default function Landing() {
                 will-change-transform
               ">
 							<Image
-								src="/images/Group 2018779500.png"
+								src="/Images/Group 2018779500.png"
 								alt="Register"
 								width={270}
 								height={270}
