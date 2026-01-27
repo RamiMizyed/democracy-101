@@ -19,7 +19,6 @@ import {
 	ChevronRight,
 	ChevronUp,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ContentItem } from "@/lib/data";
 import { useVoteStore } from "@/lib/stores/useVoteStore";
 import { useShallow } from "zustand/react/shallow";
@@ -53,7 +52,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 	const [canLeft, setCanLeft] = useState(false);
 	const [canRight, setCanRight] = useState(false);
 
-	// Tap vs scroll detection (prevents tap layer killing scroll)
+	// Tap vs scroll detection
 	const pointerRef = useRef({
 		x: 0,
 		y: 0,
@@ -61,7 +60,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		lastTap: 0,
 	});
 
-	// ✅ Toast
+	// Toast
 	const toastTimer = useRef<number | null>(null);
 	const [toast, setToast] = useState<{ show: boolean; text: string }>({
 		show: false,
@@ -80,13 +79,13 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 	const ids = useMemo(() => items.map((i) => i.id), [items]);
 	const idsKey = useMemo(() => ids.join(","), [ids]);
 
-	// ✅ hydrate votes on page load
+	// hydrate votes on page load
 	useEffect(() => {
 		if (!ids.length) return;
 		hydrate(ids);
 	}, [hydrate, idsKey, ids.length]);
 
-	// ✅ update desktop scroll availability
+	// update desktop scroll availability
 	const updateScrollEdges = useCallback(() => {
 		const el = scrollerRef.current;
 		if (!el) return;
@@ -109,7 +108,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		return () => el.removeEventListener("scroll", onScroll);
 	}, [updateScrollEdges, idsKey]);
 
-	// ✅ Detect which card is active (in view)
+	// Detect active card
 	useEffect(() => {
 		if (!scrollerRef.current) return;
 
@@ -140,7 +139,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		return () => observer.disconnect();
 	}, [idsKey]);
 
-	// ✅ Autoplay only active video
+	// Autoplay only active video
 	useEffect(() => {
 		for (const [id, vid] of Object.entries(videoRefs.current)) {
 			if (!vid) continue;
@@ -180,17 +179,11 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		return idx >= 0 ? idx : 0;
 	}, [activeId, ids]);
 
-	const goPrev = () => {
-		const prev = Math.max(0, activeIndex - 1);
-		scrollToId(ids[prev]);
-	};
+	const goPrev = () => scrollToId(ids[Math.max(0, activeIndex - 1)]);
+	const goNext = () =>
+		scrollToId(ids[Math.min(ids.length - 1, activeIndex + 1)]);
 
-	const goNext = () => {
-		const next = Math.min(ids.length - 1, activeIndex + 1);
-		scrollToId(ids[next]);
-	};
-
-	// ✅ Desktop: wheel scroll horizontally
+	// Desktop: wheel scroll horizontally
 	const onDesktopWheel = (e: React.WheelEvent<HTMLDivElement>) => {
 		const el = scrollerRef.current;
 		if (!el) return;
@@ -202,7 +195,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		}
 	};
 
-	// ✅ Tap vs scroll safe handlers
+	// Tap vs scroll safe handlers
 	const onPointerDown = (e: React.PointerEvent) => {
 		pointerRef.current.x = e.clientX;
 		pointerRef.current.y = e.clientY;
@@ -222,21 +215,20 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 		const delta = now - pointerRef.current.lastTap;
 		pointerRef.current.lastTap = now;
 
-		// ✅ double tap = helpful
+		// double tap = helpful
 		if (delta < 260) {
 			haptic();
 
 			const before = userVotes[item.id] ?? null;
-			// helpful press
 			const message =
 				before === "up" ? "Removed 👍" : before ? "Switched to 👍" : "Saved 👍";
-			fireToast(message);
 
+			fireToast(message);
 			toggleVote(item.id, "up");
 			return;
 		}
 
-		// ✅ single tap = pause/play video
+		// single tap = pause/play video
 		if (item.type === "video") {
 			const vid = videoRefs.current[item.id];
 			if (!vid) return;
@@ -269,19 +261,32 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 
 	if (items.length === 0) return null;
 
+	// small shared styles (punk-lite)
+	const punchBtn =
+		"rounded-none border-2 border-black bg-white/10 text-white font-black " +
+		"shadow-[6px_6px_0_0_rgba(0,0,0,0.9)] " +
+		"hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] " +
+		"active:translate-x-[2px] active:translate-y-[2px] transition";
+
 	return (
-		<section className="w-full py-8">
-			{/* Header row */}
+		<section className="w-full py-10">
+			{/* Header row (more like a label) */}
 			<div className="flex items-center justify-between mb-4 px-4 md:px-0">
 				<div className="flex items-center gap-3">
-					<h2 className="text-2xl font-extrabold text-zinc-900">{title}</h2>
-					<span className="hidden md:inline-flex text-xs font-semibold text-zinc-500">
-						{activeIndex + 1} / {items.length}
+					<div className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+						<span className="inline-block w-2 h-2 bg-[#FF4E02]" />
+						<h2 className="text-sm md:text-base font-black uppercase tracking-[0.18em] text-black">
+							{title}
+						</h2>
+					</div>
+
+					<span className="hidden md:inline-flex text-xs font-black uppercase tracking-[0.18em] text-black/60">
+						{activeIndex + 1}/{items.length}
 					</span>
 				</div>
 
 				<div className="hidden md:flex items-center gap-2">
-					<span className="text-xs text-zinc-500">
+					<span className="text-xs font-semibold text-black/55">
 						Wheel to scroll • Double tap = Helpful
 					</span>
 
@@ -290,7 +295,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 						size="icon"
 						disabled={!canLeft}
 						onClick={goPrev}
-						className="rounded-full">
+						className="rounded-none border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
 						<ChevronLeft className="w-4 h-4" />
 					</Button>
 
@@ -299,13 +304,12 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 						size="icon"
 						disabled={!canRight}
 						onClick={goNext}
-						className="rounded-full">
+						className="rounded-none border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
 						<ChevronRight className="w-4 h-4" />
 					</Button>
 				</div>
 			</div>
 
-			{/* Scroller wrapper */}
 			<div className="relative">
 				{/* Desktop floating arrows */}
 				<div className="hidden md:block pointer-events-none">
@@ -315,11 +319,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 							size="icon"
 							disabled={!canLeft}
 							onClick={goPrev}
-							className="
-                rounded-full shadow-md
-                bg-white/70 backdrop-blur-md
-                border border-black/10
-              ">
+							className="rounded-none border-2 border-black bg-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
 							<ChevronLeft className="w-5 h-5" />
 						</Button>
 					</div>
@@ -330,30 +330,26 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 							size="icon"
 							disabled={!canRight}
 							onClick={goNext}
-							className="
-                rounded-full shadow-md
-                bg-white/70 backdrop-blur-md
-                border border-black/10
-              ">
+							className="rounded-none border-2 border-black bg-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
 							<ChevronRight className="w-5 h-5" />
 						</Button>
 					</div>
 				</div>
 
-				{/* ✅ Mobile Next Button (Reels style) */}
+				{/* Mobile Next Button */}
 				<div className="md:hidden pointer-events-none">
 					<div className="pointer-events-auto fixed right-4 z-50 bottom-[max(1.25rem,env(safe-area-inset-bottom))]">
 						<Button
 							onClick={goNext}
 							disabled={activeIndex >= items.length - 1}
 							className="
-                rounded-full
-                px-4 py-5
-                h-auto
-                shadow-[0_18px_50px_rgba(0,0,0,0.35)]
-                bg-[#FF4E02] text-[#141414] font-extrabold
-                hover:bg-[#FF4E02]/90
-                active:scale-[0.98]
+                rounded-none border-2 border-black
+                px-4 py-5 h-auto
+                bg-[#FF4E02] text-[#141414] font-black uppercase
+                shadow-[8px_8px_0_0_rgba(0,0,0,1)]
+                hover:translate-x-[1px] hover:translate-y-[1px]
+                hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]
+                active:translate-x-[2px] active:translate-y-[2px]
                 transition
               ">
 							<span className="mr-2">Next</span>
@@ -362,24 +358,20 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 					</div>
 				</div>
 
-				{/* ✅ Toast (glass) */}
+				{/* Toast (stamp style) */}
 				<div
 					aria-live="polite"
 					className={`
             fixed left-1/2 -translate-x-1/2 z-[60]
             bottom-[calc(env(safe-area-inset-bottom)+1.25rem)]
-            transition-all duration-250
+            transition-all duration-200
             ${toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}
           `}>
-					<div
-						className="
-              px-4 py-2 rounded-full
-              bg-white/70 backdrop-blur-xl
-              border border-black/10
-              shadow-md
-              text-sm font-semibold text-zinc-900
-            ">
-						{toast.text}
+					<div className="border-2 border-black bg-white px-3 py-2 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
+						<div className="text-xs font-black uppercase tracking-[0.18em] text-black">
+							<span className="mr-2 inline-block w-2 h-2 bg-[#FF4E02]" />
+							{toast.text}
+						</div>
 					</div>
 				</div>
 
@@ -399,7 +391,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
             md:flex-row md:h-auto
             md:overflow-x-auto md:overflow-y-hidden
             md:snap-x md:snap-proximity
-            md:pb-8 md:gap-5 md:px-0
+            md:pb-8 md:gap-6 md:px-0
           ">
 					{items.map((item) => {
 						const itemCounts = counts[item.id] ?? { up: 0, down: 0 };
@@ -418,16 +410,17 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 								className="
                   snap-center shrink-0
                   w-full h-[82svh]
-                  md:w-[380px] md:h-[660px]
+                  md:w-[390px] md:h-[670px]
                 ">
 								<Card
 									className={`
-    relative overflow-hidden rounded-3xl
-    border bg-black
-    h-full w-full
-    transition-all duration-300
-    ${isActive ? "ring-2 ring-[#FF4E02]/35 border-white/15" : "opacity-95 border-white/10"}
-  `}>
+                    relative overflow-hidden
+                    rounded-none border-2
+                    bg-black h-full w-full
+                    shadow-[10px_10px_0_0_rgba(0,0,0,1)]
+                    transition
+                    ${isActive ? "border-[#FF4E02]" : "border-white/20"}
+                  `}>
 									{/* MEDIA */}
 									<div
 										className="absolute inset-0"
@@ -463,15 +456,19 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 										)}
 									</div>
 
-									{/* TOP */}
+									{/* TOP BAR */}
 									<div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-start justify-between">
 										<div className="flex flex-col gap-2">
-											<Badge className="bg-white/12 text-white border-white/20 backdrop-blur-md">
-												{item.category}
-											</Badge>
+											{/* category stamp */}
+											<div className="inline-flex items-center gap-2 border-2 border-white/80 bg-black/55 backdrop-blur-sm px-3 py-1">
+												<span className="inline-block w-2 h-2 bg-[#FF4E02]" />
+												<span className="text-[11px] font-black uppercase tracking-[0.22em] text-white">
+													{item.category}
+												</span>
+											</div>
 
 											{isActive && (
-												<span className="text-[11px] text-white/70">
+												<span className="text-[11px] font-semibold text-white/70">
 													{item.type === "video"
 														? "Tap = pause • Double tap = Helpful"
 														: "Double tap = Helpful"}
@@ -479,6 +476,7 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 											)}
 										</div>
 
+										{/* sound button (hard) */}
 										<button
 											onClick={(e) => {
 												e.stopPropagation();
@@ -486,10 +484,14 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 												haptic();
 											}}
 											className="
-                        rounded-full p-2
-                        bg-white/10 border border-white/15
-                        text-white/90 backdrop-blur-md
-                        hover:bg-white/15 transition
+                        border-2 border-white/70
+                        bg-black/55 backdrop-blur-sm
+                        px-2 py-2
+                        shadow-[5px_5px_0_0_rgba(0,0,0,0.9)]
+                        text-white
+                        hover:translate-x-[1px] hover:translate-y-[1px]
+                        hover:shadow-[3px_3px_0_0_rgba(0,0,0,0.9)]
+                        transition
                       "
 											aria-label={muted ? "Unmute" : "Mute"}>
 											{muted ? (
@@ -500,27 +502,28 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 										</button>
 									</div>
 
-									{/* Stronger gradient */}
-									<div className="absolute inset-x-0 bottom-0 z-10 h-[66%] bg-gradient-to-t from-black via-black/50 to-transparent" />
+									{/* BOTTOM GRADIENT */}
+									<div className="absolute inset-x-0 bottom-0 z-10 h-[68%] bg-gradient-to-t from-black via-black/45 to-transparent" />
 
-									{/* ✅ TikTok-style title blur pill */}
-									<div
-										className="
-                      absolute bottom-0 left-0 right-0 z-20
-                      p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]
-                    ">
+									{/* BOTTOM UI */}
+									<div className="absolute bottom-0 left-0 right-0 z-20 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
 										<div className="flex items-end gap-4">
+											{/* Title + desc as “cutout” label */}
 											<div className="flex-1 min-w-0">
+												{/* tape */}
+												<div className="pointer-events-none mb-2 flex gap-2">
+													<div className="h-3 w-16 bg-white/20 rotate-[-6deg]" />
+													<div className="h-3 w-10 bg-white/20 rotate-[8deg]" />
+												</div>
+
 												<div
 													className="
-                            inline-block
-                            rounded-2xl
-                            bg-black/35 backdrop-blur-xl
-                            border border-white/10
+                            border-2 border-white/70
+                            bg-black/40 backdrop-blur-md
                             px-4 py-3
-                            shadow-[0_20px_60px_rgba(0,0,0,0.35)]
+                            shadow-[8px_8px_0_0_rgba(0,0,0,0.9)]
                           ">
-													<h3 className="text-white font-extrabold text-xl leading-tight line-clamp-2">
+													<h3 className="text-white font-black text-xl leading-tight line-clamp-2">
 														{item.title}
 													</h3>
 
@@ -529,14 +532,14 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 													</p>
 
 													{myVote && (
-														<p className="mt-2 text-xs text-white/55">
+														<p className="mt-2 text-xs text-white/65 font-semibold">
 															Saved ✅ Tap again to undo.
 														</p>
 													)}
 												</div>
 											</div>
 
-											{/* Action rail */}
+											{/* Action rail (integrated) */}
 											<div className="flex flex-col items-center gap-3">
 												<Button
 													disabled={isPending}
@@ -545,25 +548,20 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 														e.stopPropagation();
 														voteAction(item.id, "up");
 													}}
-													className={`
-                            rounded-full w-12 h-12 p-0
-                            border border-white/15
-                            bg-white/10 backdrop-blur-md
-                            hover:bg-white/15 transition
-                            ${myVote === "up" ? "ring-2 ring-[#FF4E02]/55" : ""}
-                          `}
+													className={`${punchBtn} w-12 h-12 p-0 ${
+														myVote === "up"
+															? "border-[#FF4E02]"
+															: "border-white/50"
+													}`}
 													aria-label="Helpful">
 													<ThumbsUp
 														className={`w-5 h-5 ${
-															myVote === "up"
-																? "text-[#FF4E02]"
-																: "text-white/90"
+															myVote === "up" ? "text-[#FF4E02]" : "text-white"
 														}`}
 														fill={myVote === "up" ? "currentColor" : "none"}
 													/>
 												</Button>
-
-												<span className="text-white/85 text-xs font-semibold -mt-2">
+												<span className="text-white/85 text-xs font-black -mt-2">
 													{itemCounts.up}
 												</span>
 
@@ -574,30 +572,25 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 														e.stopPropagation();
 														voteAction(item.id, "down");
 													}}
-													className={`
-                            rounded-full w-12 h-12 p-0
-                            border border-white/15
-                            bg-white/10 backdrop-blur-md
-                            hover:bg-white/15 transition
-                            ${myVote === "down" ? "ring-2 ring-red-400/55" : ""}
-                          `}
+													className={`${punchBtn} w-12 h-12 p-0 ${
+														myVote === "down"
+															? "border-red-300"
+															: "border-white/50"
+													}`}
 													aria-label="Confusing">
 													<ThumbsDown
 														className={`w-5 h-5 ${
-															myVote === "down"
-																? "text-red-300"
-																: "text-white/90"
+															myVote === "down" ? "text-red-300" : "text-white"
 														}`}
 														fill={myVote === "down" ? "currentColor" : "none"}
 													/>
 												</Button>
-
-												<span className="text-white/85 text-xs font-semibold -mt-2">
+												<span className="text-white/85 text-xs font-black -mt-2">
 													{itemCounts.down}
 												</span>
 
 												{item.type === "video" && (
-													<div className="mt-1 flex items-center justify-center text-white/70">
+													<div className="mt-1 flex items-center justify-center text-white/75">
 														<Play className="w-4 h-4" />
 													</div>
 												)}
@@ -605,7 +598,9 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 										</div>
 
 										{isPending && (
-											<div className="mt-3 text-xs text-white/60">Saving…</div>
+											<div className="mt-3 text-xs text-white/70 font-semibold">
+												Saving…
+											</div>
 										)}
 									</div>
 								</Card>
@@ -624,15 +619,15 @@ export default function ContentFeed({ title, items }: ContentFeedProps) {
 								onClick={() => scrollToId(id)}
 								aria-label={`Go to item ${idx + 1}`}
 								className={`
-                  h-2 rounded-full transition-all
-                  ${isOn ? "w-7 bg-[#FF4E02]" : "w-2 bg-black/15"}
+                  h-2 transition-all border border-black
+                  ${isOn ? "w-7 bg-[#FF4E02]" : "w-2 bg-white"}
                 `}
 							/>
 						);
 					})}
 
 					{ids.length > 8 && (
-						<span className="ml-2 text-xs text-zinc-500">
+						<span className="ml-2 text-xs font-black text-black/60">
 							{activeIndex + 1}/{ids.length}
 						</span>
 					)}

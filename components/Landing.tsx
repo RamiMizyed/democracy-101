@@ -111,7 +111,7 @@ export default function Landing() {
 				className="
           relative z-10
           container mx-auto
-          px-6 sm:px-10 md:px-24
+          px-6 
           min-h-[calc(100svh-78px)]
           py-14 md:py-20
           grid gap-10
@@ -172,28 +172,10 @@ export default function Landing() {
 						</span>,{" "}
 						<span className="font-black text-black">visual lessons</span>, and
 						tools that let you participate.
-						<span className="ml-2 inline-block border-2 border-black bg-[#FF4E02] px-2 py-0.5 text-xs font-black uppercase tracking-tight">
+						<span className="ml-2 inline-block border-2 border-black text-white bg-[#FF4E02] px-2 py-0.5 text-xs font-black uppercase tracking-tight">
 							no lectures
 						</span>
 					</p>
-
-					{/* STICKER CHIPS */}
-					<div
-						data-hero="reveal"
-						className="mt-6 flex flex-wrap justify-center md:justify-start gap-2">
-						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-2deg]">
-							⚡ short episodes
-						</span>
-						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[1deg]">
-							🧠 real examples
-						</span>
-						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-1deg]">
-							🗳️ vote helpful / confusing
-						</span>
-						<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[2deg]">
-							🔥 learn → vote → act
-						</span>
-					</div>
 
 					{/* CTA (SCREEN PRINT STYLE) */}
 					<div
@@ -252,7 +234,7 @@ export default function Landing() {
 					<div className="md:hidden mt-9 w-full flex items-center justify-center gap-3">
 						<div data-hero="sticker" className="rotate-[-2deg]">
 							<Image
-								src="/images/VoteImg3.png"
+								src="/Images/VoteImg3.png"
 								alt="Sticker"
 								width={88}
 								height={88}
@@ -263,7 +245,7 @@ export default function Landing() {
 
 						<div data-hero="sticker" className="rotate-[2deg]">
 							<Image
-								src="/images/VoteImg5.png"
+								src="/Images/VoteImg5.png"
 								alt="Sticker"
 								width={88}
 								height={88}
@@ -274,7 +256,7 @@ export default function Landing() {
 
 						<div data-hero="sticker" className="rotate-[-1deg]">
 							<Image
-								src="/images/VoteImg1.png"
+								src="/Images/VoteImg1.png"
 								alt="Vote"
 								width={104}
 								height={104}
@@ -304,7 +286,7 @@ export default function Landing() {
                 p-3
               ">
 							<Image
-								src="/images/VoteImg1.png"
+								src="/Images/VoteImg1.png"
 								alt="Vote"
 								width={340}
 								height={340}
@@ -314,7 +296,7 @@ export default function Landing() {
 						</div>
 
 						{/* manifesto card */}
-						<div
+						{/* <div
 							data-hero="sticker"
 							className="
                 absolute left-[0%] top-[12%]
@@ -365,20 +347,20 @@ export default function Landing() {
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> */}
 
 						{/* banner sticker */}
 						<div
 							data-hero="sticker"
 							className="
-                absolute bottom-[20%] left-[6%]
+                absolute bottom-[50%] left-[-6%]
                 rotate-[1deg]
                 border-2 border-black bg-white
                 shadow-[10px_10px_0_0_rgba(0,0,0,1)]
                 p-3
               ">
 							<Image
-								src="/images/VoteImg3.png"
+								src="/Images/VoteImg3.png"
 								alt="Banner"
 								width={230}
 								height={230}
@@ -397,28 +379,12 @@ export default function Landing() {
                 p-3
               ">
 							<Image
-								src="/images/VoteImg5.png"
+								src="/Images/VoteImg5.png"
 								alt="V"
 								width={220}
 								height={220}
 								className="select-none"
 							/>
-						</div>
-
-						{/* bottom orange tag */}
-						<div
-							data-hero="sticker"
-							className="
-                absolute -bottom-6 right-8
-                rotate-[2deg]
-                border-2 border-black
-                bg-[#FF4E02]
-                shadow-[6px_6px_0_0_rgba(0,0,0,1)]
-                px-4 py-2
-              ">
-							<div className="text-[11px] font-black uppercase tracking-[0.22em]">
-								youth-made • feed-native
-							</div>
 						</div>
 					</div>
 				</div>

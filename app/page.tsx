@@ -105,7 +105,6 @@ export default function Page() {
 						</p>
 					</div>
 					<ContributeSection />
-					<ContributeDialog label="Contribute" type="General" />
 				</div>
 			</div>
 		</main>

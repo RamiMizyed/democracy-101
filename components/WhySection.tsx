@@ -9,7 +9,7 @@ export default function WhySection() {
 			className="relative w-full py-16 overflow-hidden  text-[#0b0b0b]">
 			{/* RAW ZINE BACKDROP */}
 
-			<div className="relative container mx-auto px-6 sm:px-10 md:px-24">
+			<div className="relative container mx-auto px-6 ">
 				{/* TOP STAMP */}
 				<div className="inline-flex items-center gap-3">
 					<span className="inline-flex items-center gap-2 border-2 border-black px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em] bg-white">

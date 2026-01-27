@@ -16,7 +16,7 @@ interface ThemeChipsProps {
 
 export default function ThemeChips({ selected, onToggle }: ThemeChipsProps) {
 	return (
-		<div className="flex flex-wrap gap-2 justify-center py-4 sticky top-[60px] z-30 bg-white/80 backdrop-blur-md border-b">
+		<div className="flex flex-wrap gap-2 justify-center py-4 sticky top-[70px] z-30 bg-white/80 backdrop-blur-md border-b">
 			<span className="text-sm font-semibold text-zinc-500 mr-2 self-center">
 				Filter by:
 			</span>
