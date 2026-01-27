@@ -129,7 +129,7 @@ export default function Navbar() {
 						asChild
 						variant="outline"
 						className="
-              rounded-xl
+              rounded-sm
               border-black/10
               bg-white/50 backdrop-blur-xl
               hover:bg-black/5
