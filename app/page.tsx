@@ -62,7 +62,6 @@ export default function Page() {
 
     return (
         <main className="min-h-screen bg-[#f6f0e8] text-[#141414]">
-            <Navbar />
 
             {/* Hero Section */}
             <div ref={heroRef}>

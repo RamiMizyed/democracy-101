@@ -29,26 +29,17 @@ export default function WhySection() {
             id="about"
             className="relative w-full py-20 lg:py-28 overflow-hidden text-[#0b0b0b]">
             
-            {/* Background elements */}
             <div className="absolute top-0 right-[-10%] w-[500px] h-[500px] bg-[#FF4E02] opacity-[0.03] rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 left-[-10%] w-[600px] h-[600px] bg-indigo-900 opacity-[0.02] rounded-full blur-3xl pointer-events-none" />
 
-            {/* Main Container */}
             <div className="relative container mx-auto px-8">
-                
-                {/* TOP: 2-COLUMN MANIFESTO & EXPLAINER VISUAL */}
                 <div className="grid gap-12 md:grid-cols-[1.2fr_0.8fr] items-center">
-                    
-                    {/* Left: Manifesto Text */}
                     <div className="flex flex-col items-start text-left">
-                        
-                        {/* Stamp */}
                         <div className="inline-flex items-center gap-2 border-2 border-black px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] bg-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] mb-8">
                             <span className="inline-block h-2 w-2 bg-[#FF4E02]" />
                             WHY THIS EXISTS
                         </div>
 
-                        {/* Headline */}
                         <h3 className="text-[clamp(2.5rem,4vw,4.5rem)] text-black font-black leading-[0.95] tracking-tight uppercase">
                             Civic education is losing
                             <br />
@@ -58,7 +49,6 @@ export default function WhySection() {
                             </span>
                         </h3>
 
-                        {/* Subcopy */}
                         <div className="mt-8 space-y-5 text-base md:text-lg leading-relaxed font-medium text-black/80 max-w-[55ch]">
                             <p>
                                 Billion-dollar marketing and political narrative machines completely dominate the feed. Meanwhile, educators and human rights advocates are still speaking in PDFs and cold lectures.
@@ -68,7 +58,6 @@ export default function WhySection() {
                             </p>
                         </div>
 
-                        {/* BRAND PLATFORM STICKERS */}
                         <div className="mt-8 flex flex-wrap items-center gap-3">
                             <div className="flex items-center gap-2 border-2 border-black bg-[#FF4E02] text-black px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] rotate-[-2deg] transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
                                 <TikTokIcon />
@@ -83,48 +72,40 @@ export default function WhySection() {
                                 <span className="font-black uppercase tracking-tight text-[11px] md:text-xs">YouTube</span>
                             </div>
                         </div>
-
                     </div>
 
-                    {/* Right: Explainer Visual Area */}
                     <div className="relative w-full aspect-video md:aspect-square lg:aspect-[4/3]">
-                        {/* Tape Details */}
                         <div className="absolute -top-3 left-6 w-24 h-7 bg-black/80 opacity-20 rotate-[-4deg] z-10" />
                         <div className="absolute -bottom-3 right-6 w-20 h-7 bg-black/80 opacity-20 rotate-[5deg] z-10" />
 
-                        {/* Visual Container */}
-                        <div className="w-full h-full border-2 border-black bg-white shadow-[10px_10px_0_0_rgba(0,0,0,1)] flex items-center justify-center p-4 relative overflow-hidden">
-                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
-                            <div className="relative z-10 border-2 border-dashed border-black/30 w-full h-full flex items-center justify-center text-center p-6 bg-zinc-50/80">
-                                <span className="text-zinc-500 font-black uppercase tracking-widest text-sm leading-relaxed">
-                                    [ Drop Explainer Video /<br/>Illustration Here ]
-                                </span>
+                        <div className="w-full h-full border-2 border-black bg-white shadow-[10px_10px_0_0_rgba(0,0,0,1)] p-4 relative overflow-hidden">
+                            <div className="relative w-full h-full border-2 border-black bg-zinc-100 overflow-hidden">
+                                <Image 
+                                    src="/Images/0cf154f36d9ae74e9bbb0d23f4565318.jpg" 
+                                    alt="Content Illustration"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                />
                             </div>
                         </div>
                     </div>
-
                 </div>
 
-                {/* BOTTOM: 3-COLUMN VISUAL GRID */}
                 <div className="mt-20 lg:mt-28 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 lg:gap-10">
                     
                     {/* Card 01 */}
                     <div className="relative group flex flex-col h-full">
                         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-7 bg-black/80 opacity-20 rotate-[-2deg] z-10" />
-                        
                         <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
                             <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
-                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-                                    [ Metaphorical Art ]
-                                </div>
                                 <Image 
-                                    src="/Images/placeholder-1.jpg" 
+                                    src="/Images/848e8640c162e49c8a84501a3cf8f3e7.jpg" 
                                     alt="Democracy as a practice"
                                     fill
-                                    className="object-cover opacity-0 group-hover:opacity-100 transition-opacity" 
+                                    className="object-contain" 
                                 />
                             </div>
-                            
                             <div className="p-6 flex-1 flex flex-col">
                                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
                                     01 • Signal. Not Noise.
@@ -146,14 +127,15 @@ export default function WhySection() {
                                 NO BS
                             </div>
                         </div>
-
                         <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
                             <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
-                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-                                    [ Feed-Native Art ]
-                                </div>
+                                <Image 
+                                    src="/Images/246472ad3c441f8f8625835f8feed25f.jpg"
+                                    alt="Built for the feed"
+                                    fill
+                                    className="object-contain" 
+                                />
                             </div>
-                            
                             <div className="p-6 flex-1 flex flex-col">
                                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
                                     02 • Format Matters
@@ -171,14 +153,15 @@ export default function WhySection() {
                     {/* Card 03 */}
                     <div className="relative group flex flex-col h-full">
                          <div className="absolute -bottom-3 right-6 w-20 h-7 bg-black/80 opacity-20 rotate-[5deg] z-10" />
-
                         <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
                             <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
-                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
-                                    [ Action Art ]
-                                </div>
+                                <Image 
+                                    src="/Images/f541d7b2ee89d3faf0d02f104ef36ea7.jpg"
+                                    alt="Learn Vote Act"
+                                    fill
+                                    className="object-contain" 
+                                />
                             </div>
-                            
                             <div className="p-6 flex-1 flex flex-col">
                                 <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
                                     03 • The Loop
@@ -192,7 +175,6 @@ export default function WhySection() {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
