@@ -1,217 +1,200 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
+
+// --- NATIVE SVG ICONS ---
+const TikTokIcon = () => (
+    <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+);
+
+const InstagramIcon = () => (
+    <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+    </svg>
+);
+
+const YouTubeIcon = () => (
+    <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-1.96C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 1.96C1 8.18 1 12 1 12s0 3.82.46 5.58a2.78 2.78 0 0 0 1.94 1.96c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-1.96c.46-1.76.46-5.58.46-5.58s0-3.82-.46-5.58zM9.54 15.57V8.43L15.82 12l-6.28 3.57z" />
+    </svg>
+);
 
 export default function WhySection() {
-	return (
-		<section
-			id="about"
-			className="relative w-full py-16 overflow-hidden  text-[#0b0b0b]">
-			{/* RAW ZINE BACKDROP */}
+    return (
+        <section
+            id="about"
+            className="relative w-full py-20 lg:py-28 overflow-hidden text-[#0b0b0b]">
+            
+            {/* Background elements */}
+            <div className="absolute top-0 right-[-10%] w-[500px] h-[500px] bg-[#FF4E02] opacity-[0.03] rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-[-10%] w-[600px] h-[600px] bg-indigo-900 opacity-[0.02] rounded-full blur-3xl pointer-events-none" />
 
-			<div className="relative container mx-auto px-6 ">
-				{/* TOP STAMP */}
-				<div className="inline-flex items-center gap-3">
-					<span className="inline-flex items-center gap-2 border-2 border-black px-3 py-1 text-[11px] font-black uppercase tracking-[0.22em] bg-white">
-						<span className="inline-block h-2 w-2 bg-[#FF4E02]" />
-						WHY THIS EXISTS
-					</span>
+            {/* Main Container */}
+            <div className="relative container mx-auto px-8">
+                
+                {/* TOP: 2-COLUMN MANIFESTO & EXPLAINER VISUAL */}
+                <div className="grid gap-12 md:grid-cols-[1.2fr_0.8fr] items-center">
+                    
+                    {/* Left: Manifesto Text */}
+                    <div className="flex flex-col items-start text-left">
+                        
+                        {/* Stamp */}
+                        <div className="inline-flex items-center gap-2 border-2 border-black px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] bg-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] mb-8">
+                            <span className="inline-block h-2 w-2 bg-[#FF4E02]" />
+                            WHY THIS EXISTS
+                        </div>
 
-					<span className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
-						NOT A NONPROFIT BROCHURE
-					</span>
-				</div>
+                        {/* Headline */}
+                        <h3 className="text-[clamp(2.5rem,4vw,4.5rem)] text-black font-black leading-[0.95] tracking-tight uppercase">
+                            Civic education is losing
+                            <br />
+                            <span className="relative inline-block mt-2 text-[#FF4E02]">
+                                the attention war.
+                                <span className="absolute left-0 right-0 -bottom-1 h-[8px] bg-[#FF4E02] opacity-30 -z-10" />
+                            </span>
+                        </h3>
 
-				<div className="mt-7 grid lg:grid-cols-[1.2fr_0.8fr] gap-8 items-start">
-					{/* LEFT: BIG MESSAGE */}
-					<div>
-						<h3 className="text-[clamp(2.2rem,4vw,3.6rem)]  bg-gradient-to-r from-[#FF4E02] to-rose-900 text-transparent bg-clip-text font-black leading-[0.95] tracking-tight uppercase">
-							Civic education is losing
-							<br />
-							<span className="relative inline-block">
-								the attention war.
-								<span className="absolute left-0 right-0 -bottom-1 h-[10px] bg-[#FF4E02] opacity-70 -z-10" />
-							</span>
-						</h3>
+                        {/* Subcopy */}
+                        <div className="mt-8 space-y-5 text-base md:text-lg leading-relaxed font-medium text-black/80 max-w-[55ch]">
+                            <p>
+                                Billion-dollar marketing and political narrative machines completely dominate the feed. Meanwhile, educators and human rights advocates are still speaking in PDFs and cold lectures.
+                            </p>
+                            <p>
+                                <strong className="font-black text-black">Democracy 101</strong> brings civic power back into the spaces you actually live in: <strong className="font-black text-black">TikTok, Instagram, YouTube.</strong> No corporate tone. Just civic clarity that hits.
+                            </p>
+                        </div>
 
-						<p className="mt-5 max-w-[72ch] text-base md:text-lg leading-relaxed font-semibold text-black/80">
-							Billion-dollar marketing + political narrative machines dominate
-							the feed.
-							<br />
-							Meanwhile, educators and human rights people are still speaking in
-							PDFs.
-						</p>
+                        {/* BRAND PLATFORM STICKERS */}
+                        <div className="mt-8 flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-2 border-2 border-black bg-[#FF4E02] text-black px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] rotate-[-2deg] transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
+                                <TikTokIcon />
+                                <span className="font-black uppercase tracking-tight text-[11px] md:text-xs">TikTok</span>
+                            </div>
+                            <div className="flex items-center gap-2 border-2 border-black bg-white text-black px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] rotate-[1deg] transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
+                                <InstagramIcon />
+                                <span className="font-black uppercase tracking-tight text-[11px] md:text-xs">Instagram</span>
+                            </div>
+                            <div className="flex items-center gap-2 border-2 border-black bg-white text-black px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] rotate-[-1deg] transition-transform hover:-translate-y-1 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
+                                <YouTubeIcon />
+                                <span className="font-black uppercase tracking-tight text-[11px] md:text-xs">YouTube</span>
+                            </div>
+                        </div>
 
-						<p className="mt-4 max-w-[72ch] text-base md:text-lg leading-relaxed font-semibold text-black/80">
-							<span className="font-black text-black">Democracy 101</span>{" "}
-							brings democracy back into the same spaces young people actually
-							live in:
-							<span className="font-black text-black">
-								{" "}
-								TikTok, Instagram, YouTube
-							</span>
-							.
-							<br />
-							No lectures. No corporate tone. Just civic clarity that hits.
-						</p>
+                    </div>
 
-						{/* STICKER CHIPS */}
-						<div className="mt-6 flex flex-wrap gap-2">
-							<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-2deg]">
-								⚡ short episodes
-							</span>
-							<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[1deg]">
-								🧠 real examples
-							</span>
-							<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[-1deg]">
-								🗳️ participation-first
-							</span>
-							<span className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 text-xs font-black uppercase tracking-tight rotate-[2deg]">
-								🔥 feed-native
-							</span>
-						</div>
+                    {/* Right: Explainer Visual Area */}
+                    <div className="relative w-full aspect-video md:aspect-square lg:aspect-[4/3]">
+                        {/* Tape Details */}
+                        <div className="absolute -top-3 left-6 w-24 h-7 bg-black/80 opacity-20 rotate-[-4deg] z-10" />
+                        <div className="absolute -bottom-3 right-6 w-20 h-7 bg-black/80 opacity-20 rotate-[5deg] z-10" />
 
-						{/* CTA (RAW) */}
-						<div className="mt-8 flex flex-col sm:flex-row gap-3">
-							<Link
-								href="#lessons"
-								className="
-                  inline-flex items-center justify-center
-                  border-2 border-black
-                  bg-black text-white
-                  px-6 py-4
-                  font-black uppercase tracking-tight
-                  shadow-[6px_6px_0_0_rgba(0,0,0,1)]
-                  hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
-                  transition
-                ">
-								Start learning
-							</Link>
+                        {/* Visual Container */}
+                        <div className="w-full h-full border-2 border-black bg-white shadow-[10px_10px_0_0_rgba(0,0,0,1)] flex items-center justify-center p-4 relative overflow-hidden">
+                            <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]" />
+                            <div className="relative z-10 border-2 border-dashed border-black/30 w-full h-full flex items-center justify-center text-center p-6 bg-zinc-50/80">
+                                <span className="text-zinc-500 font-black uppercase tracking-widest text-sm leading-relaxed">
+                                    [ Drop Explainer Video /<br/>Illustration Here ]
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-							<Link
-								href="#contribute"
-								className="
-                  inline-flex items-center justify-center
-                  border-2 border-black
-                  bg-white text-black
-                  px-6 py-4
-                  font-black uppercase tracking-tight
-                  shadow-[6px_6px_0_0_rgba(0,0,0,1)]
-                  hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_rgba(0,0,0,1)]
-                  transition
-                ">
-								Contribute
-							</Link>
-						</div>
-					</div>
+                </div>
 
-					{/* RIGHT: ZINE NOTE / MANIFESTO BOX */}
-					<div className="relative">
-						{/* tape corners */}
-						<div className="absolute -top-3 left-6 w-20 h-6 bg-black/80 opacity-20 rotate-[-8deg]" />
-						<div className="absolute -top-2 right-7 w-16 h-6 bg-black/80 opacity-20 rotate-[10deg]" />
+                {/* BOTTOM: 3-COLUMN VISUAL GRID */}
+                <div className="mt-20 lg:mt-28 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-6 lg:gap-10">
+                    
+                    {/* Card 01 */}
+                    <div className="relative group flex flex-col h-full">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-7 bg-black/80 opacity-20 rotate-[-2deg] z-10" />
+                        
+                        <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
+                            <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                                    [ Metaphorical Art ]
+                                </div>
+                                <Image 
+                                    src="/Images/placeholder-1.jpg" 
+                                    alt="Democracy as a practice"
+                                    fill
+                                    className="object-cover opacity-0 group-hover:opacity-100 transition-opacity" 
+                                />
+                            </div>
+                            
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
+                                    01 • Signal. Not Noise.
+                                </div>
+                                <h4 className="text-xl lg:text-2xl font-black uppercase tracking-tight mb-3">
+                                    Democracy isn’t vibes.
+                                </h4>
+                                <p className="text-sm font-medium text-black/70 leading-relaxed mt-auto">
+                                    It’s a practice. It means understanding your rights, enforcing limits on power, and active participation.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-						<div className="border-2 border-black bg-white p-6 shadow-[10px_10px_0_0_rgba(0,0,0,1)]">
-							<div className="flex items-start justify-between gap-3">
-								<div>
-									<div className="text-[11px] font-black uppercase tracking-[0.22em] text-black/70">
-										OUR PROMISE
-									</div>
-									<div className="mt-2 text-2xl font-black uppercase leading-none">
-										Signal.
-										<span className="text-[#FF4E02]"> Not noise.</span>
-									</div>
-								</div>
+                    {/* Card 02 */}
+                    <div className="relative group flex flex-col h-full">
+                        <div className="absolute -top-4 -right-2 rotate-[6deg] border-2 border-black bg-[#FF4E02] px-3 py-2 shadow-[4px_4px_0_0_rgba(0,0,0,1)] z-20">
+                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-black">
+                                NO BS
+                            </div>
+                        </div>
 
-								<span className="border-2 border-black bg-[#FF4E02] px-2 py-1 text-[11px] font-black uppercase tracking-[0.18em]">
-									NO BS
-								</span>
-							</div>
+                        <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
+                            <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                                    [ Feed-Native Art ]
+                                </div>
+                            </div>
+                            
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
+                                    02 • Format Matters
+                                </div>
+                                <h4 className="text-xl lg:text-2xl font-black uppercase tracking-tight mb-3">
+                                    Built for the feed.
+                                </h4>
+                                <p className="text-sm font-medium text-black/70 leading-relaxed mt-auto">
+                                    Short, narrative-driven episodes and visual lessons. We make complex civic concepts actually watchable.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-							<div className="mt-5 space-y-3">
-								<div className="border-2 border-black p-3">
-									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
-										01
-									</div>
-									<div className="mt-1 font-black uppercase">
-										Democracy isn’t vibes.
-									</div>
-									<div className="mt-1 text-sm font-semibold text-black/80">
-										It’s a practice. Rights, limits on power, participation.
-									</div>
-								</div>
+                    {/* Card 03 */}
+                    <div className="relative group flex flex-col h-full">
+                         <div className="absolute -bottom-3 right-6 w-20 h-7 bg-black/80 opacity-20 rotate-[5deg] z-10" />
 
-								<div className="border-2 border-black p-3">
-									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
-										02
-									</div>
-									<div className="mt-1 font-black uppercase">
-										Built for the feed.
-									</div>
-									<div className="mt-1 text-sm font-semibold text-black/80">
-										Short episodes + visuals that are actually watchable.
-									</div>
-								</div>
+                        <div className="flex-1 border-2 border-black bg-white shadow-[8px_8px_0_0_rgba(0,0,0,1)] flex flex-col overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)]">
+                            <div className="relative w-full aspect-[4/3] bg-zinc-100 border-b-2 border-black overflow-hidden">
+                                <div className="absolute inset-0 flex items-center justify-center text-zinc-400 font-black uppercase tracking-widest text-xs text-center p-4 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+                                    [ Action Art ]
+                                </div>
+                            </div>
+                            
+                            <div className="p-6 flex-1 flex flex-col">
+                                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-[#FF4E02] mb-2">
+                                    03 • The Loop
+                                </div>
+                                <h4 className="text-xl lg:text-2xl font-black uppercase tracking-tight mb-3">
+                                    Learn → Vote → Act.
+                                </h4>
+                                <p className="text-sm font-medium text-black/70 leading-relaxed mt-auto">
+                                    Education without action is just trivia. Your participation here makes the platform smarter over time.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
 
-								<div className="border-2 border-black p-3">
-									<div className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
-										03
-									</div>
-									<div className="mt-1 font-black uppercase">
-										Learn → vote → act.
-									</div>
-									<div className="mt-1 text-sm font-semibold text-black/80">
-										Participation makes the platform smarter over time.
-									</div>
-								</div>
-							</div>
-
-							{/* scribble footer */}
-							<div className="mt-6 border-t-2 border-black pt-4">
-								<div className="text-sm font-black uppercase tracking-tight">
-									DIY civic clarity. made for young people.
-								</div>
-								<div className="mt-2 text-xs font-semibold text-black/70">
-									No one is coming to save democracy for you. That’s the point.
-								</div>
-							</div>
-						</div>
-
-						{/* side sticker */}
-						<div className="absolute -bottom-6 -left-4 rotate-[-6deg] border-2 border-black bg-[#FF4E02] px-3 py-2 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-							<div className="text-[11px] font-black uppercase tracking-[0.22em] text-black">
-								YOUTH MADE
-							</div>
-						</div>
-					</div>
-				</div>
-
-				{/* BOTTOM: THEME STRIP (PUNK NAV) */}
-				<div className="mt-10 border-2 border-black bg-white px-4 py-4 shadow-[8px_8px_0_0_rgba(0,0,0,1)]">
-					<div className="flex flex-wrap items-center gap-2">
-						<span className="text-[11px] font-black uppercase tracking-[0.22em] opacity-70">
-							WE HIT:
-						</span>
-						<span className="border-2 border-black px-2 py-1 text-xs font-black uppercase">
-							Ideas
-						</span>
-						<span className="border-2 border-black px-2 py-1 text-xs font-black uppercase">
-							Institutions
-						</span>
-						<span className="border-2 border-black px-2 py-1 text-xs font-black uppercase">
-							Power
-						</span>
-						<span className="border-2 border-black px-2 py-1 text-xs font-black uppercase">
-							Future
-						</span>
-
-						<span className="ml-auto text-xs font-black uppercase tracking-tight">
-							<span className="text-[#FF4E02]">Next:</span> scroll down → pick a
-							topic → vote
-						</span>
-					</div>
-				</div>
-			</div>
-		</section>
-	);
+                </div>
+            </div>
+        </section>
+    );
 }

@@ -1,638 +1,398 @@
 "use client";
 
 import React, {
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-	useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useCallback,
 } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
-	ThumbsUp,
-	ThumbsDown,
-	Play,
-	Volume2,
-	VolumeX,
-	ChevronLeft,
-	ChevronRight,
-	ChevronUp,
+    ThumbsUp,
+    ThumbsDown,
+    Play,
+    Volume2,
+    VolumeX,
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import { ContentItem } from "@/lib/data";
 import { useVoteStore } from "@/lib/stores/useVoteStore";
 import { useShallow } from "zustand/react/shallow";
 
 interface ContentFeedProps {
-	title: string;
-	items: ContentItem[];
+    title: string;
+    items: ContentItem[];
 }
 
 type VoteType = "up" | "down";
 
 export default function ContentFeed({ title, items }: ContentFeedProps) {
-	const { counts, userVotes, pending, toggleVote, hydrate } = useVoteStore(
-		useShallow((s) => ({
-			counts: s.counts,
-			userVotes: s.userVotes,
-			pending: s.pending,
-			toggleVote: s.toggleVote,
-			hydrate: s.hydrate,
-		})),
-	);
+    const { counts, userVotes, pending, toggleVote, hydrate } = useVoteStore(
+        useShallow((s) => ({
+            counts: s.counts,
+            userVotes: s.userVotes,
+            pending: s.pending,
+            toggleVote: s.toggleVote,
+            hydrate: s.hydrate,
+        })),
+    );
 
-	// Reel UX state
-	const scrollerRef = useRef<HTMLDivElement | null>(null);
-	const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
-	const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
-	const [activeId, setActiveId] = useState<string | null>(null);
-	const [muted, setMuted] = useState(true);
+    // Reel UX state
+    const scrollerRef = useRef<HTMLDivElement | null>(null);
+    const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+    const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [muted, setMuted] = useState(true);
 
-	// Desktop nav state
-	const [canLeft, setCanLeft] = useState(false);
-	const [canRight, setCanRight] = useState(false);
+    // Desktop nav state
+    const [canLeft, setCanLeft] = useState(false);
+    const [canRight, setCanRight] = useState(true);
 
-	// Tap vs scroll detection
-	const pointerRef = useRef({
-		x: 0,
-		y: 0,
-		moved: false,
-		lastTap: 0,
-	});
+    // Tap vs scroll detection
+    const pointerRef = useRef({
+        x: 0,
+        y: 0,
+        moved: false,
+        lastTap: 0,
+    });
 
-	// Toast
-	const toastTimer = useRef<number | null>(null);
-	const [toast, setToast] = useState<{ show: boolean; text: string }>({
-		show: false,
-		text: "",
-	});
+    // Toast
+    const toastTimer = useRef<number | null>(null);
+    const [toast, setToast] = useState<{ show: boolean; text: string }>({
+        show: false,
+        text: "",
+    });
 
-	const fireToast = (text: string) => {
-		setToast({ show: true, text });
+    const fireToast = (text: string) => {
+        setToast({ show: true, text });
+        if (toastTimer.current) window.clearTimeout(toastTimer.current);
+        toastTimer.current = window.setTimeout(() => {
+            setToast({ show: false, text: "" });
+        }, 1500);
+    };
 
-		if (toastTimer.current) window.clearTimeout(toastTimer.current);
-		toastTimer.current = window.setTimeout(() => {
-			setToast({ show: false, text: "" });
-		}, 1050);
-	};
+    const ids = useMemo(() => items.map((i) => i.id), [items]);
+    const idsKey = useMemo(() => ids.join(","), [ids]);
 
-	const ids = useMemo(() => items.map((i) => i.id), [items]);
-	const idsKey = useMemo(() => ids.join(","), [ids]);
+    // Hydrate votes
+    useEffect(() => {
+        if (!ids.length) return;
+        hydrate(ids);
+    }, [hydrate, idsKey, ids.length]);
 
-	// hydrate votes on page load
-	useEffect(() => {
-		if (!ids.length) return;
-		hydrate(ids);
-	}, [hydrate, idsKey, ids.length]);
+    // Update scroll edges
+    const updateScrollEdges = useCallback(() => {
+        const el = scrollerRef.current;
+        if (!el) return;
+        const max = el.scrollWidth - el.clientWidth;
+        const left = el.scrollLeft;
+        setCanLeft(left > 10);
+        setCanRight(left < max - 10);
+    }, []);
 
-	// update desktop scroll availability
-	const updateScrollEdges = useCallback(() => {
-		const el = scrollerRef.current;
-		if (!el) return;
+    useEffect(() => {
+        updateScrollEdges();
+        const el = scrollerRef.current;
+        if (!el) return;
+        const onScroll = () => updateScrollEdges();
+        el.addEventListener("scroll", onScroll, { passive: true });
+        return () => el.removeEventListener("scroll", onScroll);
+    }, [updateScrollEdges, idsKey]);
 
-		const max = el.scrollWidth - el.clientWidth;
-		const left = el.scrollLeft;
+    // Detect active card via Intersection Observer
+    useEffect(() => {
+        if (!scrollerRef.current) return;
+        const root = scrollerRef.current;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const best = entries
+                    .filter((e) => e.isIntersecting)
+                    .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
 
-		setCanLeft(left > 8);
-		setCanRight(left < max - 8);
-	}, []);
+                if (best?.target) {
+                    const id = (best.target as HTMLElement).dataset.id;
+                    if (id) setActiveId(id);
+                }
+            },
+            { root, threshold: 0.7 } 
+        );
 
-	useEffect(() => {
-		updateScrollEdges();
-		const el = scrollerRef.current;
-		if (!el) return;
+        const nodes = root.querySelectorAll("[data-reel]");
+        nodes.forEach((n) => observer.observe(n));
+        return () => observer.disconnect();
+    }, [idsKey]);
 
-		const onScroll = () => updateScrollEdges();
-		el.addEventListener("scroll", onScroll, { passive: true });
+    // Autoplay active video, pause others
+    useEffect(() => {
+        for (const [id, vid] of Object.entries(videoRefs.current)) {
+            if (!vid) continue;
+            vid.muted = muted;
+            if (id === activeId) {
+                const p = vid.play();
+                if (p && typeof p.catch === "function") p.catch(() => {});
+            } else {
+                vid.pause();
+            }
+        }
+    }, [activeId, muted]);
 
-		return () => el.removeEventListener("scroll", onScroll);
-	}, [updateScrollEdges, idsKey]);
+    const haptic = () => {
+        if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+            navigator.vibrate?.(10);
+        }
+    };
 
-	// Detect active card
-	useEffect(() => {
-		if (!scrollerRef.current) return;
+    const scrollToId = (id: string) => {
+        const node = cardRefs.current[id];
+        if (!node) return;
+        node.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    };
 
-		const root = scrollerRef.current;
+    const activeIndex = useMemo(() => {
+        if (!activeId) return 0;
+        const idx = ids.indexOf(activeId);
+        return idx >= 0 ? idx : 0;
+    }, [activeId, ids]);
 
-		const observer = new IntersectionObserver(
-			(entries) => {
-				const best = entries
-					.filter((e) => e.isIntersecting)
-					.sort(
-						(a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0),
-					)[0];
+    const goPrev = () => scrollToId(ids[Math.max(0, activeIndex - 1)]);
+    const goNext = () => scrollToId(ids[Math.min(ids.length - 1, activeIndex + 1)]);
 
-				if (best?.target) {
-					const id = (best.target as HTMLElement).dataset.id;
-					if (id) setActiveId(id);
-				}
-			},
-			{
-				root,
-				threshold: [0.55, 0.7, 0.85],
-			},
-		);
+    // Tap vs scroll logic
+    const onPointerDown = (e: React.PointerEvent) => {
+        pointerRef.current.x = e.clientX;
+        pointerRef.current.y = e.clientY;
+        pointerRef.current.moved = false;
+    };
 
-		const nodes = root.querySelectorAll("[data-reel]");
-		nodes.forEach((n) => observer.observe(n));
+    const onPointerMove = (e: React.PointerEvent) => {
+        const dx = Math.abs(e.clientX - pointerRef.current.x);
+        const dy = Math.abs(e.clientY - pointerRef.current.y);
+        if (dx > 10 || dy > 10) pointerRef.current.moved = true;
+    };
 
-		return () => observer.disconnect();
-	}, [idsKey]);
+    const onMediaPointerUp = (item: ContentItem) => {
+        if (pointerRef.current.moved) return;
 
-	// Autoplay only active video
-	useEffect(() => {
-		for (const [id, vid] of Object.entries(videoRefs.current)) {
-			if (!vid) continue;
+        const now = Date.now();
+        const delta = now - pointerRef.current.lastTap;
+        pointerRef.current.lastTap = now;
 
-			vid.muted = muted;
+        // Double tap = Upvote
+        if (delta < 300) {
+            haptic();
+            const before = userVotes[item.id] ?? null;
+            const message = before === "up" ? "Removed 👍" : before ? "Switched to 👍" : "Saved 👍";
+            fireToast(message);
+            toggleVote(item.id, "up");
+            return;
+        }
 
-			if (id === activeId) {
-				const p = vid.play();
-				if (p && typeof p.catch === "function") p.catch(() => {});
-			} else {
-				vid.pause();
-			}
-		}
-	}, [activeId, muted]);
+        // Single tap = Play/Pause
+        if (item.type === "video") {
+            const vid = videoRefs.current[item.id];
+            if (!vid) return;
+            if (vid.paused) vid.play().catch(() => {});
+            else vid.pause();
+        }
+    };
 
-	const haptic = () => {
-		if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-			// @ts-ignore
-			navigator.vibrate?.(10);
-		}
-	};
+    const voteAction = (id: string, vote: VoteType) => {
+        haptic();
+        const before = userVotes[id] ?? null;
+        let message = "";
+        if (before === vote) message = vote === "up" ? "Removed 👍" : "Removed 👎";
+        else if (before) message = vote === "up" ? "Switched to 👍" : "Switched to 👎";
+        else message = vote === "up" ? "Saved 👍" : "Saved 👎";
 
-	const scrollToId = (id: string) => {
-		const node = cardRefs.current[id];
-		if (!node) return;
+        fireToast(message);
+        toggleVote(id, vote);
+    };
 
-		node.scrollIntoView({
-			behavior: "smooth",
-			block: "nearest",
-			inline: "center",
-		});
-	};
+    if (items.length === 0) return null;
 
-	const activeIndex = useMemo(() => {
-		if (!activeId) return 0;
-		const idx = ids.indexOf(activeId);
-		return idx >= 0 ? idx : 0;
-	}, [activeId, ids]);
+    // Shared editorial button style (stamp)
+    const stampBtn =
+        "inline-flex items-center gap-2.5 px-3 py-2 border-2 border-black bg-white " +
+        "shadow-[4px_4px_0_0_rgba(0,0,0,1)] text-black font-black uppercase tracking-tight " +
+        "transition-all duration-200 " +
+        "hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0_0_rgba(0,0,0,1)] " +
+        "active:translate-x-[2px] active:translate-y-[2px] active:shadow-none";
 
-	const goPrev = () => scrollToId(ids[Math.max(0, activeIndex - 1)]);
-	const goNext = () =>
-		scrollToId(ids[Math.min(ids.length - 1, activeIndex + 1)]);
+    return (
+        <section className="w-full py-6 scroll-mt-28">
+            
+            {/* Header: Label & Global Navigation (aligned to px-8) */}
+            <div className="flex items-center justify-between px-8 md:px-0 mb-8">
+                <div className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                    <span className="inline-block w-2 h-2 bg-[#FF4E02]" />
+                    <h2 className="text-xs md:text-sm font-black uppercase tracking-[0.18em] text-black">
+                        {title}
+                    </h2>
+                </div>
 
-	// Desktop: wheel scroll horizontally
-	const onDesktopWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		const el = scrollerRef.current;
-		if (!el) return;
-		if (window.innerWidth < 768) return;
+                <div className="hidden md:flex items-center gap-3">
+                    <span className="text-xs font-black uppercase tracking-widest text-black/40 mr-4">
+                        {activeIndex + 1} / {items.length}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        disabled={!canLeft}
+                        onClick={goPrev}
+                        className="rounded-none w-10 h-10 border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                        <ChevronLeft className="w-5 h-5" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        disabled={!canRight}
+                        onClick={goNext}
+                        className="rounded-none w-10 h-10 border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
+                        <ChevronRight className="w-5 h-5" />
+                    </Button>
+                </div>
+            </div>
 
-		if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-			e.preventDefault();
-			el.scrollLeft += e.deltaY;
-		}
-	};
+            {/* Global Toast */}
+            <div
+                aria-live="polite"
+                className={`
+                    fixed top-24 left-1/2 -translate-x-1/2 z-[100] transition-all duration-200
+                    ${toast.show ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95 pointer-events-none"}
+                `}>
+                <div className="border-2 border-black bg-[#FF4E02] px-4 py-2 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
+                    <div className="text-sm font-black uppercase tracking-widest text-black">
+                        {toast.text}
+                    </div>
+                </div>
+            </div>
 
-	// Tap vs scroll safe handlers
-	const onPointerDown = (e: React.PointerEvent) => {
-		pointerRef.current.x = e.clientX;
-		pointerRef.current.y = e.clientY;
-		pointerRef.current.moved = false;
-	};
-
-	const onPointerMove = (e: React.PointerEvent) => {
-		const dx = Math.abs(e.clientX - pointerRef.current.x);
-		const dy = Math.abs(e.clientY - pointerRef.current.y);
-		if (dx > 10 || dy > 10) pointerRef.current.moved = true;
-	};
-
-	const onMediaPointerUp = (item: ContentItem) => {
-		if (pointerRef.current.moved) return;
-
-		const now = Date.now();
-		const delta = now - pointerRef.current.lastTap;
-		pointerRef.current.lastTap = now;
-
-		// double tap = helpful
-		if (delta < 260) {
-			haptic();
-
-			const before = userVotes[item.id] ?? null;
-			const message =
-				before === "up" ? "Removed 👍" : before ? "Switched to 👍" : "Saved 👍";
-
-			fireToast(message);
-			toggleVote(item.id, "up");
-			return;
-		}
-
-		// single tap = pause/play video
-		if (item.type === "video") {
-			const vid = videoRefs.current[item.id];
-			if (!vid) return;
-
-			if (vid.paused) vid.play().catch(() => {});
-			else vid.pause();
-		}
-	};
-
-	const voteAction = (id: string, vote: VoteType) => {
-		haptic();
-
-		const before = userVotes[id] ?? null;
-		const message =
-			before === vote
-				? vote === "up"
-					? "Removed 👍"
-					: "Removed 👎"
-				: before
-					? vote === "up"
-						? "Switched to 👍"
-						: "Switched to 👎"
-					: vote === "up"
-						? "Saved 👍"
-						: "Saved 👎";
-
-		fireToast(message);
-		toggleVote(id, vote);
-	};
-
-	if (items.length === 0) return null;
-
-	// small shared styles (punk-lite)
-	const punchBtn =
-		"rounded-none border-2 border-black bg-white/10 text-white font-black " +
-		"shadow-[6px_6px_0_0_rgba(0,0,0,0.9)] " +
-		"hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[4px_4px_0_0_rgba(0,0,0,0.9)] " +
-		"active:translate-x-[2px] active:translate-y-[2px] transition";
-
-	return (
-		<section className="w-full py-10">
-			{/* Header row (more like a label) */}
-			<div className="flex items-center justify-between mb-4 px-4 md:px-0">
-				<div className="flex items-center gap-3">
-					<div className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1 shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-						<span className="inline-block w-2 h-2 bg-[#FF4E02]" />
-						<h2 className="text-sm md:text-base font-black uppercase tracking-[0.18em] text-black">
-							{title}
-						</h2>
-					</div>
-
-					<span className="hidden md:inline-flex text-xs font-black uppercase tracking-[0.18em] text-black/60">
-						{activeIndex + 1}/{items.length}
-					</span>
-				</div>
-
-				<div className="hidden md:flex items-center gap-2">
-					<span className="text-xs font-semibold text-black/55">
-						Wheel to scroll • Double tap = Helpful
-					</span>
-
-					<Button
-						variant="outline"
-						size="icon"
-						disabled={!canLeft}
-						onClick={goPrev}
-						className="rounded-none border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-						<ChevronLeft className="w-4 h-4" />
-					</Button>
-
-					<Button
-						variant="outline"
-						size="icon"
-						disabled={!canRight}
-						onClick={goNext}
-						className="rounded-none border-2 border-black bg-white shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
-						<ChevronRight className="w-4 h-4" />
-					</Button>
-				</div>
-			</div>
-
-			<div className="relative">
-				{/* Desktop floating arrows */}
-				<div className="hidden md:block pointer-events-none">
-					<div className="pointer-events-auto absolute left-2 top-1/2 -translate-y-1/2 z-30">
-						<Button
-							variant="secondary"
-							size="icon"
-							disabled={!canLeft}
-							onClick={goPrev}
-							className="rounded-none border-2 border-black bg-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-							<ChevronLeft className="w-5 h-5" />
-						</Button>
-					</div>
-
-					<div className="pointer-events-auto absolute right-2 top-1/2 -translate-y-1/2 z-30">
-						<Button
-							variant="secondary"
-							size="icon"
-							disabled={!canRight}
-							onClick={goNext}
-							className="rounded-none border-2 border-black bg-white shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-							<ChevronRight className="w-5 h-5" />
-						</Button>
-					</div>
-				</div>
-
-				{/* Mobile Next Button */}
-				<div className="md:hidden pointer-events-none">
-					<div className="pointer-events-auto fixed right-4 z-50 bottom-[max(1.25rem,env(safe-area-inset-bottom))]">
-						<Button
-							onClick={goNext}
-							disabled={activeIndex >= items.length - 1}
-							className="
-                rounded-none border-2 border-black
-                px-4 py-5 h-auto
-                bg-[#FF4E02] text-[#141414] font-black uppercase
-                shadow-[8px_8px_0_0_rgba(0,0,0,1)]
-                hover:translate-x-[1px] hover:translate-y-[1px]
-                hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]
-                active:translate-x-[2px] active:translate-y-[2px]
-                transition
-              ">
-							<span className="mr-2">Next</span>
-							<ChevronUp className="w-4 h-4 rotate-90" />
-						</Button>
-					</div>
-				</div>
-
-				{/* Toast (stamp style) */}
-				<div
-					aria-live="polite"
-					className={`
-            fixed left-1/2 -translate-x-1/2 z-[60]
-            bottom-[calc(env(safe-area-inset-bottom)+1.25rem)]
-            transition-all duration-200
-            ${toast.show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"}
-          `}>
-					<div className="border-2 border-black bg-white px-3 py-2 shadow-[6px_6px_0_0_rgba(0,0,0,1)]">
-						<div className="text-xs font-black uppercase tracking-[0.18em] text-black">
-							<span className="mr-2 inline-block w-2 h-2 bg-[#FF4E02]" />
-							{toast.text}
-						</div>
-					</div>
-				</div>
-
-				{/* Scroller */}
-				<div
-					ref={scrollerRef}
-					onWheel={onDesktopWheel}
-					style={{ touchAction: "pan-y" }}
-					className="
-            relative
-            flex flex-col
-            h-[82svh] w-full overflow-y-auto
-            snap-y snap-proximity
-            gap-6 px-4
-            no-scrollbar
-
-            md:flex-row md:h-auto
-            md:overflow-x-auto md:overflow-y-hidden
-            md:snap-x md:snap-proximity
-            md:pb-8 md:gap-6 md:px-0
-          ">
-					{items.map((item) => {
-						const itemCounts = counts[item.id] ?? { up: 0, down: 0 };
-						const myVote = userVotes[item.id] ?? null;
-						const isPending = pending[item.id] ?? false;
-						const isActive = activeId === item.id;
-
-						return (
-							<div
-								key={item.id}
-								ref={(el) => {
-									cardRefs.current[item.id] = el;
-								}}
-								data-reel
-								data-id={item.id}
-								className="
-                  snap-center shrink-0
-                  w-full h-[82svh]
-                  md:w-[390px] md:h-[670px]
+            {/* The Horizontal Slider (No peeking padding) */}
+            <div
+                ref={scrollerRef}
+                className="
+                    flex overflow-x-auto gap-8 
+                    snap-x snap-mandatory 
+                    pb-10 pt-4
+                    no-scrollbar
+                    scroll-smooth
                 ">
-								<Card
-									className={`
-                    relative overflow-hidden
-                    rounded-none border-2
-                    bg-black h-full w-full
-                    shadow-[10px_10px_0_0_rgba(0,0,0,1)]
-                    transition
-                    ${isActive ? "border-[#FF4E02]" : "border-white/20"}
-                  `}>
-									{/* MEDIA */}
-									<div
-										className="absolute inset-0"
-										onPointerDown={onPointerDown}
-										onPointerMove={onPointerMove}
-										onPointerUp={() => onMediaPointerUp(item)}
-										role="button"
-										aria-label="Media">
-										{item.type === "video" ? (
-											<>
-												<video
-													ref={(el) => {
-														videoRefs.current[item.id] = el;
-													}}
-													src={item.src}
-													className="h-full w-full object-cover"
-													playsInline
-													loop
-													muted={muted}
-													preload="metadata"
-												/>
-												<div className="absolute inset-0 bg-black/10" />
-											</>
-										) : (
-											<>
-												<img
-													src={item.src}
-													alt={item.title}
-													className="h-full w-full object-cover"
-												/>
-												<div className="absolute inset-0 bg-black/10" />
-											</>
-										)}
-									</div>
+                {items.map((item) => {
+                    const itemCounts = counts[item.id] ?? { up: 0, down: 0 };
+                    const myVote = userVotes[item.id] ?? null;
+                    const isPending = pending[item.id] ?? false;
+                    const isActive = activeId === item.id;
 
-									{/* TOP BAR */}
-									<div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-start justify-between">
-										<div className="flex flex-col gap-2">
-											{/* category stamp */}
-											<div className="inline-flex items-center gap-2 border-2 border-white/80 bg-black/55 backdrop-blur-sm px-3 py-1">
-												<span className="inline-block w-2 h-2 bg-[#FF4E02]" />
-												<span className="text-[11px] font-black uppercase tracking-[0.22em] text-white">
-													{item.category}
-												</span>
-											</div>
+                    return (
+                        <div
+                            key={item.id}
+                            ref={(el) => { cardRefs.current[item.id] = el; }}
+                            data-reel
+                            data-id={item.id}
+                            className="
+                                snap-center shrink-0 w-[390px]
+                                flex flex-col group
+                                border-2 border-black bg-white
+                                shadow-[12px_12px_0_0_rgba(0,0,0,1)]
+                                p-5
+                                transition-transform duration-300
+                                hover:-translate-y-1
+                            ">
+                            
+                            {/* Media Box: Absolute 9:16 (Borders applied inside) */}
+                            <div className="relative aspect-[9/16] border-2 border-black bg-zinc-900 overflow-hidden mb-5">
+                                <div
+                                    className="absolute inset-0 cursor-pointer"
+                                    onPointerDown={onPointerDown}
+                                    onPointerMove={onPointerMove}
+                                    onPointerUp={() => onMediaPointerUp(item)}>
+                                    {item.type === "video" ? (
+                                        <video
+                                            ref={(el) => { videoRefs.current[item.id] = el; }}
+                                            src={item.src}
+                                            className={`w-full h-full object-cover transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-80'}`}
+                                            playsInline loop muted={muted} preload="metadata"
+                                        />
+                                    ) : (
+                                        <img
+                                            src={item.src}
+                                            alt={item.title}
+                                            className={`w-full h-full object-cover transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-80'}`}
+                                        />
+                                    )}
+                                </div>
 
-											{isActive && (
-												<span className="text-[11px] font-semibold text-white/70">
-													{item.type === "video"
-														? "Tap = pause • Double tap = Helpful"
-														: "Double tap = Helpful"}
-												</span>
-											)}
-										</div>
+                                {/* Sound toggle - floating inside video */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setMuted((m) => !m);
+                                        haptic();
+                                    }}
+                                    className="absolute top-3 right-3 z-20 border-2 border-black bg-white/70 backdrop-blur-sm p-1.5 shadow-[3px_3px_0_0_rgba(0,0,0,1)] hover:bg-white transition-colors">
+                                    {muted ? <VolumeX className="w-4 h-4 text-black" /> : <Volume2 className="w-4 h-4 text-black" />}
+                                </button>
+                                
+                                {/* Status Icon Overlay (Play indication) */}
+                                {item.type === "video" && videoRefs.current[item.id]?.paused && (
+                                    <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none opacity-40">
+                                        <div className="border-4 border-black bg-white/60 p-3 rounded-full">
+                                            <Play className="w-10 h-10 text-black ml-1" fill="currentColor" />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
-										{/* sound button (hard) */}
-										<button
-											onClick={(e) => {
-												e.stopPropagation();
-												setMuted((m) => !m);
-												haptic();
-											}}
-											className="
-                        border-2 border-white/70
-                        bg-black/55 backdrop-blur-sm
-                        px-2 py-2
-                        shadow-[5px_5px_0_0_rgba(0,0,0,0.9)]
-                        text-white
-                        hover:translate-x-[1px] hover:translate-y-[1px]
-                        hover:shadow-[3px_3px_0_0_rgba(0,0,0,0.9)]
-                        transition
-                      "
-											aria-label={muted ? "Unmute" : "Mute"}>
-											{muted ? (
-												<VolumeX className="w-4 h-4" />
-											) : (
-												<Volume2 className="w-4 h-4" />
-											)}
-										</button>
-									</div>
+                            {/* Info Area: SOLID TEXT, NOT OVER VIDEO */}
+                            <div className="flex-1 flex flex-col pointer-events-auto">
+                                <h3 className="text-2xl font-black uppercase tracking-tight text-black line-clamp-2 leading-none">
+                                    {item.title}
+                                </h3>
+                                
+                                <p className="mt-2 text-sm font-semibold text-black/70 leading-relaxed line-clamp-2">
+                                    Double tap the media above to mark as helpful practice for your civic loop.
+                                </p>
 
-									{/* BOTTOM GRADIENT */}
-									<div className="absolute inset-x-0 bottom-0 z-10 h-[68%] bg-gradient-to-t from-black via-black/45 to-transparent" />
+                                {/* Dashed Divider */}
+                                <div className="mt-5 border-t-2 border-dashed border-black pt-5" />
 
-									{/* BOTTOM UI */}
-									<div className="absolute bottom-0 left-0 right-0 z-20 p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-										<div className="flex items-end gap-4">
-											{/* Title + desc as “cutout” label */}
-											<div className="flex-1 min-w-0">
-												{/* tape */}
-												<div className="pointer-events-none mb-2 flex gap-2">
-													<div className="h-3 w-16 bg-white/20 rotate-[-6deg]" />
-													<div className="h-3 w-10 bg-white/20 rotate-[8deg]" />
-												</div>
+                                {/* Action Row: Category & Both Buttons show horizontally */}
+                                <div className="flex items-center justify-between gap-4 mt-auto">
+                                    <div className="flex items-center gap-2">
+                                        <div className="inline-block bg-[#FF4E02] text-black px-2 py-1 text-[10px] font-black uppercase tracking-widest border-2 border-black shadow-[3px_3px_0_0_rgba(0,0,0,1)] mr-1">
+                                            {item.category}
+                                        </div>
+                                        {isActive && item.type === "video" && <Play className="w-4 h-4 text-black/40" /> }
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                        {/* 👍 Like stamp */}
+                                        <button
+                                            disabled={isPending}
+                                            onClick={(e) => { e.stopPropagation(); voteAction(item.id, "up"); }}
+                                            className={`${stampBtn} ${myVote === "up" ? 'border-[#FF4E02] bg-white' : 'border-black bg-white'}`}>
+                                            <ThumbsUp className={`w-4 h-4 ${myVote === "up" ? 'text-[#FF4E02]' : 'text-black'}`} fill={myVote === "up" ? 'currentColor' : 'none'} />
+                                            <span className={`text-xs ${myVote === "up" ? 'text-[#FF4E02]' : 'text-black'}`}>{itemCounts.up}</span>
+                                        </button>
 
-												<div
-													className="
-                            border-2 border-white/70
-                            bg-black/40 backdrop-blur-md
-                            px-4 py-3
-                            shadow-[8px_8px_0_0_rgba(0,0,0,0.9)]
-                          ">
-													<h3 className="text-white font-black text-xl leading-tight line-clamp-2">
-														{item.title}
-													</h3>
-
-													<p className="mt-1.5 text-white/75 text-sm leading-relaxed line-clamp-2">
-														Short, practical civic knowledge — made simple.
-													</p>
-
-													{myVote && (
-														<p className="mt-2 text-xs text-white/65 font-semibold">
-															Saved ✅ Tap again to undo.
-														</p>
-													)}
-												</div>
-											</div>
-
-											{/* Action rail (integrated) */}
-											<div className="flex flex-col items-center gap-3">
-												<Button
-													disabled={isPending}
-													variant="ghost"
-													onClick={(e) => {
-														e.stopPropagation();
-														voteAction(item.id, "up");
-													}}
-													className={`${punchBtn} w-12 h-12 p-0 ${
-														myVote === "up"
-															? "border-[#FF4E02]"
-															: "border-white/50"
-													}`}
-													aria-label="Helpful">
-													<ThumbsUp
-														className={`w-5 h-5 ${
-															myVote === "up" ? "text-[#FF4E02]" : "text-white"
-														}`}
-														fill={myVote === "up" ? "currentColor" : "none"}
-													/>
-												</Button>
-												<span className="text-white/85 text-xs font-black -mt-2">
-													{itemCounts.up}
-												</span>
-
-												<Button
-													disabled={isPending}
-													variant="ghost"
-													onClick={(e) => {
-														e.stopPropagation();
-														voteAction(item.id, "down");
-													}}
-													className={`${punchBtn} w-12 h-12 p-0 ${
-														myVote === "down"
-															? "border-red-300"
-															: "border-white/50"
-													}`}
-													aria-label="Confusing">
-													<ThumbsDown
-														className={`w-5 h-5 ${
-															myVote === "down" ? "text-red-300" : "text-white"
-														}`}
-														fill={myVote === "down" ? "currentColor" : "none"}
-													/>
-												</Button>
-												<span className="text-white/85 text-xs font-black -mt-2">
-													{itemCounts.down}
-												</span>
-
-												{item.type === "video" && (
-													<div className="mt-1 flex items-center justify-center text-white/75">
-														<Play className="w-4 h-4" />
-													</div>
-												)}
-											</div>
-										</div>
-
-										{isPending && (
-											<div className="mt-3 text-xs text-white/70 font-semibold">
-												Saving…
-											</div>
-										)}
-									</div>
-								</Card>
-							</div>
-						);
-					})}
-				</div>
-
-				{/* Mobile progress dots */}
-				<div className="md:hidden mt-4 flex items-center justify-center gap-2">
-					{ids.slice(0, 8).map((id, idx) => {
-						const isOn = ids[activeIndex] === id;
-						return (
-							<button
-								key={id}
-								onClick={() => scrollToId(id)}
-								aria-label={`Go to item ${idx + 1}`}
-								className={`
-                  h-2 transition-all border border-black
-                  ${isOn ? "w-7 bg-[#FF4E02]" : "w-2 bg-white"}
-                `}
-							/>
-						);
-					})}
-
-					{ids.length > 8 && (
-						<span className="ml-2 text-xs font-black text-black/60">
-							{activeIndex + 1}/{ids.length}
-						</span>
-					)}
-				</div>
-			</div>
-		</section>
-	);
+                                        {/* 👎 Dislike stamp */}
+                                        <button
+                                            disabled={isPending}
+                                            onClick={(e) => { e.stopPropagation(); voteAction(item.id, "down"); }}
+                                            className={`${stampBtn} ${myVote === "down" ? 'border-zinc-900 bg-zinc-900' : 'border-black bg-white'}`}>
+                                            <ThumbsDown className={`w-4 h-4 ${myVote === "down" ? 'text-white' : 'text-black'}`} fill={myVote === "down" ? 'currentColor' : 'none'} />
+                                            <span className={`text-xs ${myVote === "down" ? 'text-white' : 'text-black'}`}>{itemCounts.down}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+            
+        </section>
+    );
 }
