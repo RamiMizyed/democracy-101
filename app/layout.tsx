@@ -20,8 +20,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${inter.className} antialiased bg-grid`}>
-            <Navbar />
-
+            	<Navbar />
 				{children}
 				<Footer/>
 			</body>
